@@ -76,12 +76,13 @@ const settings = definePluginSettings({
         type: OptionType.STRING,
         name: "Username for untis",
         description: "Its your untis username",
+        defaultValue: "your-username"
     },
     Untisver: {
         type: OptionType.STRING,
         name: "Untis Version",
         description: "Your untis version",
-        defaultValue: ""
+        defaultValue: "arche",
     },
     UntisType: {
         type: OptionType.SELECT,
