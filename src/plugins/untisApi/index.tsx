@@ -175,6 +175,7 @@ const UntisAPIPlugin: React.FC = () => {
             settings.store.Untisver || "defaultVersion",
             settings.store.UntisType || "defaultType"
         );
+        await webUntis.setUp();
         setIsOpen(!isOpen);
 
 
