@@ -253,7 +253,9 @@ class WebUntisAPI {
             timetableParams
         );
 
-        return await this.renameArray(result.timetable as periodArray) as periodArray;
+        const renamedArray = await this.renameArray(result.timetable as periodArray) as periodArray;
+        renamedArray.periods.sort((a, b) => a.startDateTimeUnix! - b.startDateTimeUnix!);
+        return renamedArray;
     }
 
     public getCurrentMonday(): string {
@@ -265,7 +267,7 @@ class WebUntisAPI {
 
     public getCurrentFriday(): string {
         const monday = new Date(this.getCurrentMonday());
-        return new Date(monday.setDate(monday.getDate() + 4)).toISOString().split("T")[0];
+        return new Date(monday.setDate(monday.getDate() + 5)).toISOString().split("T")[0];
     }
 }
 

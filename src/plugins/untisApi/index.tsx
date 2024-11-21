@@ -246,7 +246,19 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                 </ModalHeader>
                 <div className="vc-untis-modal-content">
                     <p>Current lesson:</p>
-                    <pre>{timetable ? JSON.stringify(timetable, null, 2) : "Loading..."}</pre>
+                    <pre>
+                        {timetable ? (
+                            timetable.periods.map((period: any, index: number) => (
+                                <div key={index}>
+                                    {period.subjects.map((subject: any) => (
+                                        <div key={subject.id}>{subject.name} start at {period.startDateTime} and ends at {period.endDateTime}</div>
+                                    ))}
+                                </div>
+                            ))
+                        ) : (
+                            "Loading..."
+                        )}
+                    </pre>
                 </div>
             </div>
         </ModalRoot>
