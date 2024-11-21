@@ -5,7 +5,7 @@
  */
 
 import { generateTOTP } from "./otp";
-const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+const proxyUrl = "";
 
 import Getter from "./Getter";
 import { _Class, _Room, _Subject, _Teacher, periodArray, userApiData } from "./interfaces";
@@ -171,7 +171,7 @@ class WebUntisAPI {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                ...(this.authToken && { Authorization: `Bearer ${this.authToken}` }),
+
             },
             body: JSON.stringify(baseJson),
         });
