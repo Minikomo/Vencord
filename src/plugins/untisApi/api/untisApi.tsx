@@ -165,7 +165,7 @@ class WebUntisAPI {
             params: [params],
         };
 
-        console.log("Sending API request:", baseJson);
+        // console.log("Sending API request:", baseJson);
 
         const response = await fetch(proxyUrl + endpoint, {
             method: "POST",
@@ -187,7 +187,7 @@ class WebUntisAPI {
         if (data.error) {
             throw new Error(data.error.message || "Unknown API error");
         }
-        console.log("API response:", data);
+        // console.log("API response:", data);
 
 
         return data.result;
@@ -210,7 +210,7 @@ class WebUntisAPI {
 
 
         this.authToken = result.token;
-        console.log("Authentication successful. Token:", this.authToken);
+        // console.log("Authentication successful. Token:", this.authToken);
     }
 
     private async ensureAuthenticated() {
