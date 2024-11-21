@@ -1,0 +1,17 @@
+
+#search-button {
+    width: 40px; /* Adjust for desired size */
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: none; /* Ensures no background */
+    border: none; /* Removes border if any */
+}
+
+#search-buttonsvg {
+    background: none; /* Removes any default white background */
+    width: 40px; /* Adjust size as needed */
+    height: 40px;
+    align-items: center;
+}

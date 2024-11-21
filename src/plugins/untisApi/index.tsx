@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import "./style.css";
+
 import { addChatBarButton, removeChatBarButton } from "@api/ChatButtons";
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
@@ -11,8 +13,6 @@ import definePlugin, { OptionType } from "@utils/types";
 import { FluxDispatcher, React, useState } from "@webpack/common";
 
 import WebUntisAPI from "./api/untisApi";
-
-
 
 
 interface ActivityAssets {
@@ -214,25 +214,6 @@ const UntisAPIPlugin: React.FC = () => {
 
     return (
         <div>
-            <style>
-                {`
-        #search-button {
-            width: 40px; /* Adjust for desired size */
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: none; /* Ensures no background */
-            border: none; /* Removes border if any */
-        }
-        #search-buttonsvg {
-            background: none; /* Removes any default white background */
-            width: 40px; /* Adjust size as needed */
-            height: 40px;
-            align-items: center;
-        }
-        `}
-            </style>
             <button id="search-button" onClick={handleButtonClick}>
                 <svg className="search-buttonsvg" viewBox="0 0 24 24" fill="#b5bac1">
                     <path className="st0" d="M12,0C5.37,0,0,5.37,0,12s5.37,12,12,12,12-5.37,12-12S18.63,0,12,0ZM1.53,12.33v-.67h3.89v.67H1.53ZM4.83,19.64l-.47-.47,2.75-2.75.47.47-2.75,2.75ZM7.11,7.58l-2.75-2.75.47-.47,2.75,2.75-.47.47ZM12.33,22.47h-.67v-3.89h.67v3.89ZM19.17,19.64l-2.75-2.75.47-.47,2.75,2.75-.47.47ZM11,12V2.53c.39-.39.61-.61,1-1,.39.39.61.61,1,1v6.05l4.8-4.8h1.42v1.42l-4.8,4.8h7.05c.39.39.61.61,1,1-.39.39-.61.61-1,1h-10.47Z" />
