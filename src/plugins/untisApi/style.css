@@ -1,17 +1,43 @@
-
-#search-button {
-    width: 40px; /* Adjust for desired size */
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: none; /* Ensures no background */
-    border: none; /* Removes border if any */
+.vc-untis-button {
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .untis-button {
     background: none; /* Removes any default white background */
-    width: 24px; /* Adjust size as needed */
-    height: 24px;
+    width: 48px;
+    height: 48px;
     align-items: center;
+    color: var(--interactive-normal);
+    cursor: pointer;
+    transition: color 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.untis-button:hover {
+    color: var(--interactive-active);
+    animation: wiggle 0.5s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes wiggle {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+
+    25% {
+        transform: rotate(10deg) scale(1.1);
+    }
+
+    50% {
+        transform: rotate(-10deg) scale(1.1);
+    }
+
+    75% {
+        transform: rotate(10deg) scale(1.1);
+    }
+
+    100% {
+        transform: rotate(0deg) scale(1);
+    }
 }
