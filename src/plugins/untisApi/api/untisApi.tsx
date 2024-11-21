@@ -256,14 +256,14 @@ class WebUntisAPI {
         return await this.renameArray(result.timetable as periodArray) as periodArray;
     }
 
-    private getCurrentMonday(): string {
+    public getCurrentMonday(): string {
         const today = new Date();
         const day = today.getDay();
         const diff = today.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is Sunday
         return new Date(today.setDate(diff)).toISOString().split("T")[0];
     }
 
-    private getCurrentFriday(): string {
+    public getCurrentFriday(): string {
         const monday = new Date(this.getCurrentMonday());
         return new Date(monday.setDate(monday.getDate() + 4)).toISOString().split("T")[0];
     }

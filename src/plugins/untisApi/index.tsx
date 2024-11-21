@@ -10,8 +10,9 @@ import { addServerListElement, removeServerListElement, ServerListRenderPosition
 import { definePluginSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
+import { ModalHeader, ModalProps, ModalRoot, openModal } from "@utils/modal";
 import definePlugin, { OptionType } from "@utils/types";
-import { Button, FluxDispatcher, React } from "@webpack/common";
+import { Button, React } from "@webpack/common";
 
 import WebUntisAPI from "./api/untisApi";
 
@@ -164,25 +165,18 @@ const settings = definePluginSettings({
 
 function onChange() {
 }
+
+
 const handleButtonClick = async () => {
 
-    const webUntis = new WebUntisAPI(
-        settings.store.School || "defaultSchool",
-        settings.store.UntisUsername || "defaultUsername",
-        settings.store.Key || "defaultKey",
-        settings.store.Untisver || "defaultVersion",
-        settings.store.UntisType || "defaultType"
-    );
-    await webUntis.setUp();
+    openModal(props => <UntisModalContent rootProps={props} />);
 
-    try {
+    /* try {
         // Authenticate the WebUntisAPI instance
-
         console.log("Fetching timetable...");
         const currentlessen = await webUntis.getCurrentLesson(1);
         if (!currentlessen) {
             console.log("No lesson found");
-
         } else {
             FluxDispatcher.dispatch({
                 type: "LOCAL_ACTIVITY_UPDATE",
@@ -192,19 +186,14 @@ const handleButtonClick = async () => {
                     name: "Untericht",
                     details: "Grad in einer stunde",
                     type: 0,
-
                 },
                 socketId: "CustomRPC",
             });
-
-
             // set rpc
-
-
         }
     } catch (error) {
         console.error("Error fetching timetable:", error);
-    }
+    } */
 };
 
 const UntisButton = () => (
@@ -219,6 +208,50 @@ const UntisButton = () => (
         </svg>
     </Button>
 );
+
+const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
+    const [timetable, setTimetable] = React.useState<any>(null);
+
+    React.useEffect(() => {
+        const fetchTimetable = async () => {
+            try {
+                const untis = new WebUntisAPI(
+                    settings.store.School || "defaultSchool",
+                    settings.store.UntisUsername || "defaultUsername",
+                    settings.store.Key || "defaultKey",
+                    settings.store.Untisver || "defaultVersion",
+                    settings.store.UntisType || "defaultType"
+                );
+                await untis.setUp();
+
+                const timetable = await untis.getTimetable({ id: 1, type: settings.store.UntisType as "STUDENT" | "CLASS" | "ROOM", startDate: untis.getCurrentMonday(), endDate: untis.getCurrentFriday() });
+                setTimetable(timetable);
+            } catch (error) {
+                if (error instanceof Error) {
+                    setTimetable({ error: error.message });
+                } else {
+                    setTimetable({ error: String(error) });
+                }
+            }
+        };
+
+        fetchTimetable();
+    }, []);
+
+    return (
+        <ModalRoot {...rootProps}>
+            <div className="vc-untis-modal">
+                <ModalHeader className="vc-untis-modal-header">
+                    <h3>UntisAPI</h3>
+                </ModalHeader>
+                <div className="vc-untis-modal-content">
+                    <p>Current lesson:</p>
+                    <pre>{timetable ? JSON.stringify(timetable, null, 2) : "Loading..."}</pre>
+                </div>
+            </div>
+        </ModalRoot>
+    );
+};
 
 export default definePlugin({
     name: "UntisAPI",
