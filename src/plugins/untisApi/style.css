@@ -9,9 +9,9 @@
     border: none; /* Removes border if any */
 }
 
-#search-buttonsvg {
+.untis-button {
     background: none; /* Removes any default white background */
-    width: 40px; /* Adjust size as needed */
-    height: 40px;
+    width: 24px; /* Adjust size as needed */
+    height: 24px;
     align-items: center;
 }
