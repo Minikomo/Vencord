@@ -347,7 +347,9 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         // startDateTime: "2024-11-20T07:30Z"
         return timetable.filter((period: any) => {
             const startDateTime = new Date(period.startDateTime);
-            return startDateTime.getDay() === weekday && startDateTime.toISOString().includes(time);
+            const isRightWeekday = startDateTime.getDay() === weekday;
+            const isBetweenStartAndEnd = period.startDateTime.split("T")[1].slice(0, 5) <= time && time < period.endDateTime.split("T")[1].slice(0, 5);
+            return isRightWeekday && isBetweenStartAndEnd;
         });
     }
 
