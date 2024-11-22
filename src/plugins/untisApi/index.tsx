@@ -285,6 +285,7 @@ export default definePlugin({
     description: "Show your current lesson in Discord",
     authors: [Devs.Leonlp9, Devs.minikomo],
     settings,
+    dependencies: ["ServerListAPI"],
 
     renderUntisButton: UntisButton,
 
