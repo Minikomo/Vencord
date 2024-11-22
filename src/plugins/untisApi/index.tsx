@@ -309,11 +309,13 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                         <tbody>
                             {(timeSlots as string[]).map((timeSlot: string) => (
                                 <tr key={timeSlot as React.Key}>
-                                    <td>{`${String(timeSlot)} - ${timeGrid.days[0].units.find((unit: any) => unit.start === timeSlot)?.end || ""}`}</td>
+                                    <td>
+                                        <div>{`${String(timeSlot)} - ${timeGrid.days[0].units.find((unit: any) => unit.start === timeSlot)?.end || ""}`}</div>
+                                    </td>
                                     {timeGrid.days.map((day: any, index: number) => (
                                         <td key={index + 1}>
                                             {getPeriodsAtWeekdayAndTime(index + 1, timeSlot).map((period: any) => (
-                                                <div key={period.id}>
+                                                <div key={period.id} style={{ color: period.backColor }}>
                                                     {period.subjects.map((subject: any) => (
                                                         <div key={subject.id}>{subject.name}</div>
                                                     ))}
