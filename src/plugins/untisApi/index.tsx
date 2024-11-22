@@ -8,7 +8,6 @@ import "./style.css";
 
 import { addServerListElement, removeServerListElement, ServerListRenderPosition } from "@api/ServerList";
 import { definePluginSettings } from "@api/Settings";
-import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
 import { ModalProps, ModalRoot, openModal } from "@utils/modal";
 import definePlugin, { OptionType } from "@utils/types";
@@ -287,7 +286,7 @@ export default definePlugin({
     authors: [Devs.Leonlp9, Devs.minikomo],
     settings,
 
-    renderUntisButton: ErrorBoundary.wrap(UntisButton, { noop: false }),
+    renderUntisButton: UntisButton,
 
     start() {
         addServerListElement(ServerListRenderPosition.Above, this.renderUntisButton);
