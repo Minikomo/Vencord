@@ -287,9 +287,9 @@ export default definePlugin({
     authors: [Devs.Leonlp9, Devs.minikomo],
     settings,
 
-    renderUntisButton: ErrorBoundary.wrap(UntisButton, { noop: true }),
+    renderUntisButton: ErrorBoundary.wrap(UntisButton, { noop: false }),
 
-    async start() {
+    start() {
         addServerListElement(ServerListRenderPosition.Above, this.renderUntisButton);
     },
 
