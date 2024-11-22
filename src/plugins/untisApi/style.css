@@ -44,15 +44,18 @@
     align-items: center;
     color: var(--interactive-normal);
     cursor: pointer;
-    transition: color 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition : 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     margin-top: 2px;
     margin-bottom: 2px;
-    transform: scale(1);
+    transform: scale(1),rotate(0deg);
+
 }
 
 .untis-button:hover {
     color: var(--interactive-active);
-    animation: wiggle 0.5s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: cubic-bezier(0.075, 0.82, 0.165, 1) 500ms;
+    transform: rotate(10deg) scale(1.08);
+
 }
 
 @keyframes wiggle {
