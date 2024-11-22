@@ -309,8 +309,6 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         )
     ).sort();
 
-    console.log(timeSlots);
-
     // entfernt samstag, wenn dort kein unterricht ist
     if (getPeriodsAtWeekday(5).length === 0) {
         timeGrid.days.pop();
@@ -330,6 +328,8 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
             return startDateTime.getDay() === weekday && startDateTime.toISOString().includes(time);
         });
     }
+
+    console.log(getPeriodsAtWeekday(1));
 
     return (
         <ModalRoot className="vc-untis" {...rootProps}>
@@ -357,22 +357,22 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                                     <div key={period.id} style={{ color: period.backColor }} className="vc-untis-period">
                                                         <div>
                                                             {period.subjects.map((subject: any) => (
-                                                                <div key={subject.id}>{subject.name}</div>
+                                                                <div key={subject.id} title={subject.longName}>{subject.name}</div>
                                                             ))}
                                                         </div>
                                                         <div>
                                                             {period.teachers.map((teacher: any) => (
-                                                                <div key={teacher.id}>{teacher.name}</div>
+                                                                <div key={teacher.id} title={teacher.longName}>{teacher.name}</div>
                                                             ))}
                                                         </div>
                                                         <div>
                                                             {period.rooms.map((room: any) => (
-                                                                <div key={room.id}>{room.name}</div>
+                                                                <div key={room.id} title={room.longName}>{room.name}</div>
                                                             ))}
                                                         </div>
                                                         <div>
                                                             {period.classes.map((class_: any) => (
-                                                                <div key={class_.id}>{class_.name}</div>
+                                                                <div key={class_.id} title={class_.longName}>{class_.name}</div>
                                                             ))}
                                                         </div>
                                                     </div>
