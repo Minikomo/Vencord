@@ -335,6 +335,14 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         <ModalRoot className="vc-untis" {...rootProps}>
             <div className="vc-untis-modal">
                 <div className="vc-untis-modal-content">
+
+                    {/* change weeks */}
+                    <div className="vc-untis-week">
+                        <div className="vc-untis-week-button">{"<"}</div>
+                        <div className="vc-untis-week-text">KW 47 (22.11. - 26.11.)</div>
+                        <div className="vc-untis-week-button">{">"}</div>
+                    </div>
+
                     <table className="vc-untis-timetable">
                         <thead>
                             <tr>
