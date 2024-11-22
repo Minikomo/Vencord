@@ -281,9 +281,23 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
             const unit = units[j];
             const nextUnit = units[j + 1];
             if (unit.end === nextUnit.start) {
-                unit.end = nextUnit.end;
-                units.splice(j + 1, 1);
-                j--;
+                const periodsAtCurrentTime = getPeriodsAtWeekdayAndTime(i + 1, unit.start);
+                const periodsAtNextTime = getPeriodsAtWeekdayAndTime(i + 1, nextUnit.start);
+
+                const sameSubjectAndRoom = periodsAtCurrentTime.every((period: any) =>
+                    periodsAtNextTime.some((nextPeriod: any) =>
+                        period.subjects[0].id === nextPeriod.subjects[0].id &&
+                        period.rooms[0].id === nextPeriod.rooms[0].id &&
+                        period.teachers[0].id === nextPeriod.teachers[0].id &&
+                        period.classes[0].id === nextPeriod.classes[0].id
+                    )
+                );
+
+                if (sameSubjectAndRoom) {
+                    unit.end = nextUnit.end;
+                    units.splice(j + 1, 1);
+                    j--;
+                }
             }
         }
     }
