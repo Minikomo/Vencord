@@ -16,7 +16,7 @@
 }
 
 .vc-untis::-webkit-scrollbar {
-    width: 10px;
+    width: 0;
 }
 
 .vc-untis::-webkit-scrollbar-thumb {
@@ -213,7 +213,7 @@
 
 .REGULAR::before {
     content: '';
-    background-color: color-mix(in srgb, #0f4 12.3%, transparent);
+    background-color: color-mix(in srgb, #0f4 15.3%, transparent);
     color: white;
     padding: 2px 5px;
     border-radius: 5px;
@@ -223,7 +223,7 @@
 
 .CANCELLED::before {
     content: '';
-    background-color: color-mix(in srgb, #f04 12.3%, transparent);
+    background-color: color-mix(in srgb, rgb(255 0 17) 25.3%, transparent);
     color: white;
     padding: 2px 5px;
     border-radius: 5px;
@@ -233,7 +233,7 @@
 
 .IRREGULAR::before {
     content: '';
-    background-color: color-mix(in srgb, #f90 12.3%, transparent);
+    background-color: color-mix(in srgb, #f90 25.3%, transparent);
     color: white;
     padding: 2px 5px;
     border-radius: 5px;
@@ -283,4 +283,25 @@
     font-size: 20px;
     font-weight: bold;
     color: var(--text-normal);
+}
+
+.vc-untis-single-lesson {
+    background-color: var(--background-secondary);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
+    color: var(--text-normal);
+    font-size: 16px;
+}
+
+.vc-untis-single-lesson h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: var(--text-normal);
+}
+
+.vc-untis-single-lesson p {
+    margin: 5px 0;
+    color: var(--text-secondary);
 }

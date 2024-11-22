@@ -362,7 +362,7 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                         <td key={index + 1}>
                                             <div className="vc-untis-periods">
                                                 {getPeriodsAtWeekdayAndTime(index + 1, timeSlot).map((period: any) => (
-                                                    <div key={period.id} style={{ color: period.subjects[0].backColor }} className={"vc-untis-period " + period.is[0]}>
+                                                    <div key={period.id} style={{ color: period.subjects[0].backColor }} className={"vc-untis-period " + period.is[0]} onClick={() => openSingleLessonModal(period)}>
                                                         <div>
                                                             {period.subjects.map((subject: any) => (
                                                                 <div key={subject.id} title={subject.longName}>{subject.name}</div>
@@ -397,6 +397,24 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         </ModalRoot>
     );
 };
+
+
+const SingleLessonModalContent = ({ rootProps, period }: { rootProps: ModalProps; period: any; }) => {
+    return (
+        <ModalRoot {...rootProps}>
+            <div className="vc-untis-single-lesson">
+                <h2>{period.subjects[0].name} ({period.subjects[0].longName})</h2>
+                <p>Teacher: {period.teachers[0].name} ({period.teachers[0].longName})</p>
+                <p>Room: {period.rooms[0].name} ({period.rooms[0].longName})</p>
+                <p>Class: {period.classes[0].name} ({period.classes[0].longName})</p>
+            </div>
+        </ModalRoot>
+    );
+};
+
+function openSingleLessonModal(period: any) {
+    openModal(props => <SingleLessonModalContent rootProps={props} period={period} />);
+}
 
 
 export default definePlugin({
