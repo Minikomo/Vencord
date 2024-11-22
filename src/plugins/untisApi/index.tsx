@@ -257,11 +257,19 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
     }, []);
 
     if (error) {
-        return <div>Error: {error}</div>;
+        return (<ModalRoot {...rootProps}>
+            <div className="vc-untis-error">
+                <div>{error}</div>
+            </div>
+        </ModalRoot>);
     }
 
     if (!timeGrid || !timetable) {
-        return <div>Loading...</div>;
+        return (<ModalRoot {...rootProps}>
+            <div className="vc-untis-loading">
+                <div>Loading...</div>
+            </div>
+        </ModalRoot>);
     }
 
     // Zeitfenster aus `timeGrid` extrahieren

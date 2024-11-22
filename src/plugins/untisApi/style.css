@@ -86,6 +86,7 @@
     margin: 0;
     padding: 0;
     border-collapse: collapse;
+    table-layout: fixed;
 }
 
 .vc-untis-timetable thead {
@@ -135,4 +136,26 @@
 /* stylelint-disable-next-line no-descending-specificity */
 .vc-untis-timetable td:hover {
     background: var(--background-secondary);
+}
+
+.vc-untis-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 24px;
+    color: var(--interactive-normal);
+    border-radius: 10px;
+    border: 1px solid #4d4d4d;
+}
+
+.vc-untis-error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 24px;
+    color: var(--error);
+    border-radius: 10px;
+    border: 1px solid #4d4d4d;
 }
