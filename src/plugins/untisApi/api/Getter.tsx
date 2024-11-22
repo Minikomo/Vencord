@@ -54,7 +54,14 @@ class Getter {
         const temp = this.arraythingy.masterData.absenceReasons.find(reason => reason.id === id);
         return temp?.longName ?? "";
     }
+    public getbackColorCodeFromID(id: number): string {
+        const temp = this.arraythingy.masterData.klassen.find(klass => klass.id === id);
+        return temp?.backColor ?? "";
+    }
+    public getforeColorCodeFromID(id: number): string {
+        const temp = this.arraythingy.masterData.klassen.find(klass => klass.id === id);
+        return temp?.foreColor ?? "";
+    }
 }
-
 
 export default Getter;

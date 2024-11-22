@@ -76,6 +76,8 @@ class WebUntisAPI {
             period.rooms = [] as _Room[];
             period.startDateTimeUnix = new Date(period.startDateTime).getTime();
             period.endDateTimeUnix = new Date(period.endDateTime).getTime();
+            period.backColor = temp.getbackColorCodeFromID(period.classes![0].id);
+            period.foreColor = temp.getforeColorCodeFromID(period.classes![0].id);
 
             period.elements.forEach(element2 => {
 
