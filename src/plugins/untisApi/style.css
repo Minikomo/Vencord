@@ -354,3 +354,7 @@
     margin-top: 10px;
     margin-left: 10px;
 }
+
+.vc-untis-holiday {
+    color: var(--text-normal);
+}

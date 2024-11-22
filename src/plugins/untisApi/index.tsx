@@ -214,6 +214,8 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
     const [timetable, setTimetable] = React.useState<any[]>([]);
     const [error, setError] = React.useState<string | null>(null);
     const [timeGrid, setTimeGrid] = React.useState<any>(null);
+    const [holidays, setHolidays] = React.useState<any>(null);
+
     const untis = new WebUntisAPI(
         settings.store.School || "defaultSchool",
         settings.store.UntisUsername || "defaultUsername",
@@ -227,16 +229,10 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
     React.useEffect(() => {
         const fetchTimetable = async () => {
             try {
-                const untis = new WebUntisAPI(
-                    settings.store.School || "defaultSchool",
-                    settings.store.UntisUsername || "defaultUsername",
-                    settings.store.Key || "defaultKey",
-                    settings.store.Untisver || "arche",
-                    settings.store.UntisType || "STUDENT"
-                );
                 await untis.setUp();
 
                 const timegrid = untis.getFullUntisIdData().masterData.timeGrid;
+                setHolidays(untis.getFullUntisIdData().masterData.holidays);
 
                 // Zeitformat anpassen
                 timegrid.days.forEach((day: any) => {
@@ -353,6 +349,27 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         });
     }
 
+    function getHolidayAtDate(date: string) {
+        console.log(holidays);
+        console.log(holidays.find((holiday: any) => holiday.startDate <= date && date <= holiday.endDate));
+        return holidays.find((holiday: any) => holiday.startDate <= date && date <= holiday.endDate);
+    }
+
+    function getHolidyByWeekAndWeekdayAndYear(week: number, weekday: number, year: number) {
+        return holidays.find((holiday: any) => {
+            const start = new Date(holiday.startDate);
+            const end = new Date(holiday.endDate);
+
+            let startWeek = untis.getMondayOfCalendarWeek(week, year);
+            // add weekdays to startWeek
+            startWeek = new Date(startWeek).toISOString().split("T")[0];
+            startWeek = new Date(new Date(startWeek).setDate(new Date(startWeek).getDate() + weekday)).toISOString().split("T")[0];
+
+            const startWeekDate = new Date(startWeek);
+            return start <= startWeekDate && startWeekDate <= end;
+        });
+    }
+
     return (
         <ModalRoot className="vc-untis" {...rootProps}>
             <div className="vc-untis-modal">
@@ -409,7 +426,13 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                                         </div>
                                                     </div>
                                                 ))}
+
                                             </div>
+                                            {getHolidyByWeekAndWeekdayAndYear(currentWeek, index + 1, new Date().getFullYear()) && (
+                                                <div className="vc-untis-holiday">
+                                                    <div>{getHolidyByWeekAndWeekdayAndYear(currentWeek, index + 1, new Date().getFullYear()).longName}</div>
+                                                </div>
+                                            )}
                                         </td>
                                     ))}
                                 </tr>
