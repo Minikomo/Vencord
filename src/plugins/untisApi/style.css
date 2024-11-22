@@ -63,7 +63,7 @@
     transform: translateY(-50%);
     width: 0;
     height: 4px;
-    box-shadow: 1px 0px 2px white;
+    box-shadow: 1px 0 2px white;
     background-color: white;
     border-radius: 1px 4px 4px 0;
     transition: background-color 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
@@ -81,9 +81,7 @@
     width: 4px;
     transform: translateY(-50%);
     margin-left: -1px;
-    box-shadow: 1px 0px 0px white;
-
-
+    box-shadow: 1px 0 0 white;
 }
 
 
