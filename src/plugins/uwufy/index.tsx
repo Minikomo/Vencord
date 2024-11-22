@@ -257,6 +257,7 @@ export default definePlugin({
     description: "UwUfy your messages",
     authors: [Devs.Leonlp9, Devs.mrsfreckles, Devs.fiotux, Devs.ena_m_v, Devs.enmuowo],
     settings,
+    dependencies: ["MessageEventsAPI", "ChatInputButtonAPI"],
 
     start() {
         addChatBarButton("UwUfyToggle", UwUfyToggle);

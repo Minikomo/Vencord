@@ -190,6 +190,7 @@ export default definePlugin({
     description: "A simple Cookie Clicker game",
     authors: [Devs.Leonlp9],
     settings: settings,
+    dependencies: ["MessageEventsAPI", "ChatInputButtonAPI"],
     start() {
         addChatBarButton("CookieClickerButton", CookieClickerButton);
     },
