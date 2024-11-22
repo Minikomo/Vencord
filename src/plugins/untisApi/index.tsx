@@ -274,12 +274,28 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         </ModalRoot>);
     }
 
+    for (let i = 0; i < timeGrid.days.length; i++) {
+        const day = timeGrid.days[i];
+        const { units } = day;
+        for (let j = 0; j < units.length - 1; j++) {
+            const unit = units[j];
+            const nextUnit = units[j + 1];
+            if (unit.end === nextUnit.start) {
+                unit.end = nextUnit.end;
+                units.splice(j + 1, 1);
+                j--;
+            }
+        }
+    }
+
     // Zeitfenster aus `timeGrid` extrahieren
     const timeSlots = Array.from(
         new Set(
             timeGrid.days.flatMap((day: any) => day.units.map((unit: any) => unit.start))
         )
     ).sort();
+
+    console.log(timeSlots);
 
     // entfernt samstag, wenn dort kein unterricht ist
     if (getPeriodsAtWeekday(5).length === 0) {
@@ -300,8 +316,6 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
             return startDateTime.getDay() === weekday && startDateTime.toISOString().includes(time);
         });
     }
-
-    console.log(getPeriodsAtWeekdayAndTime(1, "07:30"));
 
     return (
         <ModalRoot className="vc-untis" {...rootProps}>
