@@ -214,6 +214,15 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
     const [timetable, setTimetable] = React.useState<any[]>([]);
     const [error, setError] = React.useState<string | null>(null);
     const [timeGrid, setTimeGrid] = React.useState<any>(null);
+    const untis = new WebUntisAPI(
+        settings.store.School || "defaultSchool",
+        settings.store.UntisUsername || "defaultUsername",
+        settings.store.Key || "defaultKey",
+        settings.store.Untisver || "arche",
+        settings.store.UntisType || "STUDENT"
+    );
+
+    const [currentWeek, setCurrentWeek] = React.useState<number>(untis.getCurrentCalendarWeek());
 
     React.useEffect(() => {
         const fetchTimetable = async () => {
@@ -228,6 +237,7 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                 await untis.setUp();
 
                 const timegrid = untis.getFullUntisIdData().masterData.timeGrid;
+
                 // Zeitformat anpassen
                 timegrid.days.forEach((day: any) => {
                     day.units.forEach((unit: any) => {
@@ -236,19 +246,26 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                     });
                 });
 
+                timegrid.days = timegrid.days.filter((day: any) => {
+                    const isSaturday = day.day === "SAT";
+                    const hasClasses = getPeriodsAtWeekday(6).length > 0;
+                    return !isSaturday || hasClasses;
+                });
+
                 setTimeGrid(timegrid);
 
                 const timetableData = await untis.getTimetable({
                     id: 1,
                     type: settings.store.UntisType as "STUDENT" | "CLASS" | "ROOM",
-                    startDate: untis.getCurrentMonday(),
-                    endDate: untis.getCurrentFriday(),
+                    startDate: untis.getMondayOfCalendarWeek(currentWeek, new Date().getFullYear()),
+                    endDate: untis.getFridayOfCalendarWeek(currentWeek, new Date().getFullYear())
                 });
 
                 setTimetable(timetableData.periods);
             } catch (error) {
                 if (error instanceof Error) {
                     setError(error.message);
+                    console.error(error);
                 } else {
                     setError(String(error));
                 }
@@ -256,7 +273,17 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         };
 
         fetchTimetable();
-    }, []);
+    }, [currentWeek]);
+
+    const handlePreviousWeek = () => {
+        setTimetable([]);
+        setCurrentWeek(currentWeek - 1);
+    };
+
+    const handleNextWeek = () => {
+        setTimetable([]);
+        setCurrentWeek(currentWeek + 1);
+    };
 
     if (error) {
         return (<ModalRoot {...rootProps}>
@@ -309,11 +336,6 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         )
     ).sort();
 
-    // entfernt samstag, wenn dort kein unterricht ist
-    if (getPeriodsAtWeekday(5).length === 0) {
-        timeGrid.days.pop();
-    }
-
     function getPeriodsAtWeekday(weekday: number) {
         return timetable.filter((period: any) => {
             const startDateTime = new Date(period.startDateTime);
@@ -329,8 +351,6 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         });
     }
 
-    console.log(getPeriodsAtWeekday(1));
-
     return (
         <ModalRoot className="vc-untis" {...rootProps}>
             <div className="vc-untis-modal">
@@ -338,9 +358,9 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
 
                     {/* change weeks */}
                     <div className="vc-untis-week">
-                        <div className="vc-untis-week-button">{"<"}</div>
-                        <div className="vc-untis-week-text">KW 47 (22.11. - 26.11.)</div>
-                        <div className="vc-untis-week-button">{">"}</div>
+                        <div className="vc-untis-week-button" onClick={handlePreviousWeek}>{"←"}</div>
+                        <div className="vc-untis-week-text">KW {currentWeek} ({untis.getMondayOfCalendarWeek(currentWeek, new Date().getFullYear())} - {untis.getFridayOfCalendarWeek(currentWeek, new Date().getFullYear())})</div>
+                        <div className="vc-untis-week-button" onClick={handleNextWeek}>{"→"}</div>
                     </div>
 
                     <table className="vc-untis-timetable">
@@ -362,7 +382,7 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                         <td key={index + 1}>
                                             <div className="vc-untis-periods">
                                                 {getPeriodsAtWeekdayAndTime(index + 1, timeSlot).map((period: any) => (
-                                                    <div key={period.id} style={{ color: period.subjects[0].backColor }} className={"vc-untis-period " + period.is[0]} onClick={() => openSingleLessonModal(period)}>
+                                                    <div key={period.id} style={{ color: period.subjects[0].backColor }} className={`vc-untis-period ${period.is[0]} ${period.homeWorks.filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0]).length > 0 ? "HOMEWORK" : ""}`} onClick={() => openSingleLessonModal(period)}>
                                                         <div>
                                                             {period.subjects.map((subject: any) => (
                                                                 <div key={subject.id} title={subject.longName}>{subject.name}</div>
@@ -407,6 +427,21 @@ const SingleLessonModalContent = ({ rootProps, period }: { rootProps: ModalProps
                 <p>Teacher: {period.teachers[0].name} ({period.teachers[0].longName})</p>
                 <p>Room: {period.rooms[0].name} ({period.rooms[0].longName})</p>
                 <p>Class: {period.classes[0].name} ({period.classes[0].longName})</p>
+
+                {period.homeWorks
+                    .filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0])
+                    .length > 0 && (
+                        <div className="vc-untis-single-lesson-homework">
+                            <h3>Homeworks</h3>
+                            {period.homeWorks
+                                .filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0])
+                                .map((homework: any) => (
+                                    <div key={homework.id}>
+                                        <p>{homework.text}</p>
+                                    </div>
+                                ))}
+                        </div>
+                    )}
             </div>
         </ModalRoot>
     );

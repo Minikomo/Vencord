@@ -275,6 +275,26 @@ class WebUntisAPI {
         return new Date(monday.setDate(monday.getDate() + 5)).toISOString().split("T")[0];
     }
 
+    public getCurrentCalendarWeek(): number {
+        const today = new Date();
+        const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
+        const pastDaysOfYear = (today.getTime() - firstDayOfYear.getTime()) / 86400000;
+        return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+    }
+
+
+    public getMondayOfCalendarWeek(week: number, year: number): string {
+        const date = new Date(year, 0, 1 + (week - 1) * 7);
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is Sunday
+        return new Date(date.setDate(diff)).toISOString().split("T")[0];
+    }
+
+    public getFridayOfCalendarWeek(week: number, year: number): string {
+        const monday = new Date(this.getMondayOfCalendarWeek(week, year));
+        return new Date(monday.setDate(monday.getDate() + 5)).toISOString().split("T")[0];
+    }
+
     // get FullUntisIdData
     public getFullUntisIdData(): userApiData {
         return this.fullUntisIdData;

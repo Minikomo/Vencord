@@ -126,6 +126,7 @@
     background: var(--background-tertiary);
     position: sticky;
     top: 0;
+    z-index: 1;
 }
 
 .vc-untis-timetable th,
@@ -154,7 +155,7 @@
     height: 35px;
 }
 
-.vc-untis-timetable tr:not(:first-child) {
+.vc-untis-timetable tbody:not(:first-child) tr {
     height: 110px;
 }
 
@@ -241,6 +242,22 @@
     font-weight: bold;
 }
 
+.HOMEWORK {
+    position: relative;
+}
+
+.HOMEWORK::after {
+    content: '🏠︎';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    font-size: 14px;
+    background: var(--background-secondary);
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
 .vc-untis-week {
     display: flex;
     justify-content: space-between;
@@ -304,4 +321,20 @@
 .vc-untis-single-lesson p {
     margin: 5px 0;
     color: var(--text-secondary);
+}
+
+.vc-untis-single-lesson-homework {
+    margin-top: 20px;
+}
+
+.vc-untis-single-lesson-homework h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: var(--text-normal);
+}
+
+.vc-untis-single-lesson-homework div {
+    margin-top: 10px;
+    margin-left: 10px;
 }
