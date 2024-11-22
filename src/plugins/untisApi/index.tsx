@@ -209,7 +209,7 @@ const UntisButton = () => (
 );
 
 const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
-    const [timetable, setTimetable] = React.useState<any>(null);
+    const [timetable, setTimetable] = React.useState<any[]>([]);
     const [error, setError] = React.useState<string | null>(null);
     const [timeGrid, setTimeGrid] = React.useState<any>(null);
 
@@ -226,20 +226,24 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                 await untis.setUp();
 
                 const timegrid = untis.getFullUntisIdData().masterData.timeGrid;
-                // convert T12:00 to 12:00 and add as a new property
+                // Zeitformat anpassen
                 timegrid.days.forEach((day: any) => {
                     day.units.forEach((unit: any) => {
-                        unit.start = unit.startTime.slice(1);
+                        unit.start = unit.startTime.slice(1); // Entfernt "T"
                         unit.end = unit.endTime.slice(1);
                     });
                 });
 
                 setTimeGrid(timegrid);
-                console.log(timegrid);
 
-                const timetable = await untis.getTimetable({ id: 1, type: settings.store.UntisType as "STUDENT" | "CLASS" | "ROOM", startDate: untis.getCurrentMonday(), endDate: untis.getCurrentFriday() });
-                console.log(timetable);
-                setTimetable(timetable);
+                const timetableData = await untis.getTimetable({
+                    id: 1,
+                    type: settings.store.UntisType as "STUDENT" | "CLASS" | "ROOM",
+                    startDate: untis.getCurrentMonday(),
+                    endDate: untis.getCurrentFriday(),
+                });
+
+                setTimetable(timetableData.periods);
             } catch (error) {
                 if (error instanceof Error) {
                     setError(error.message);
@@ -252,33 +256,87 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         fetchTimetable();
     }, []);
 
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+    if (!timeGrid || !timetable) {
+        return <div>Loading...</div>;
+    }
+
+    // Zeitfenster aus `timeGrid` extrahieren
+    const timeSlots = Array.from(
+        new Set(
+            timeGrid.days.flatMap((day: any) => day.units.map((unit: any) => unit.start))
+        )
+    ).sort();
+
+    // entfernt samstag, wenn dort kein unterricht ist
+    if (getPeriodsAtWeekday(5).length === 0) {
+        timeGrid.days.pop();
+    }
+
+    function getPeriodsAtWeekday(weekday: number) {
+        return timetable.filter((period: any) => {
+            const startDateTime = new Date(period.startDateTime);
+            return startDateTime.getDay() === weekday;
+        });
+    }
+
+    function getPeriodsAtWeekdayAndTime(weekday: number, time: string) {
+        // startDateTime: "2024-11-20T07:30Z"
+        return timetable.filter((period: any) => {
+            const startDateTime = new Date(period.startDateTime);
+            return startDateTime.getDay() === weekday && startDateTime.toISOString().includes(time);
+        });
+    }
+
+    console.log(getPeriodsAtWeekdayAndTime(1, "07:30"));
+
     return (
         <ModalRoot className="vc-untis" {...rootProps}>
             <div className="vc-untis-modal">
                 <div className="vc-untis-modal-content">
                     <table className="vc-untis-timetable">
-                        <tr className="vc-untis-timetable-header">
-                            <th>Time</th>
-                            {timeGrid?.days.map((day: any) => (
-                                <th key={day.day}>{day.day}</th>
-                            ))}
-                        </tr>
-                        {timeGrid?.days[0].units.map((unit: any, index: number) => (
-                            <tr key={unit.id}>
-                                <td>{unit.start} - {unit.end}</td>
-                                {timeGrid?.days.map((day: any) => (
-                                    <td key={day.day}>
-                                        Noch nicht implementiert
-                                    </td>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                {timeGrid.days.map((day: any) => (
+                                    <th key={day.day}>{day.day}</th>
                                 ))}
                             </tr>
-                        ))}
+                        </thead>
+                        <tbody>
+                            {(timeSlots as string[]).map((timeSlot: string) => (
+                                <tr key={timeSlot as React.Key}>
+                                    <td>{`${String(timeSlot)} - ${timeGrid.days[0].units.find((unit: any) => unit.start === timeSlot)?.end || ""}`}</td>
+                                    {timeGrid.days.map((day: any, index: number) => (
+                                        <td key={index + 1}>
+                                            {getPeriodsAtWeekdayAndTime(index + 1, timeSlot).map((period: any) => (
+                                                <div key={period.id}>
+                                                    {period.subjects.map((subject: any) => (
+                                                        <div key={subject.id}>{subject.name}</div>
+                                                    ))}
+                                                    {period.teachers.map((teacher: any) => (
+                                                        <div key={teacher.id}>{teacher.name}</div>
+                                                    ))}
+                                                    {period.classes.map((class_: any) => (
+                                                        <div key={class_.id}>{class_.name}</div>
+                                                    ))}
+                                                </div>
+                                            ))}
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
                     </table>
                 </div>
             </div>
         </ModalRoot>
     );
 };
+
 
 export default definePlugin({
     name: "UntisAPI",
