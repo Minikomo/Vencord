@@ -324,19 +324,32 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                     </td>
                                     {timeGrid.days.map((day: any, index: number) => (
                                         <td key={index + 1}>
-                                            {getPeriodsAtWeekdayAndTime(index + 1, timeSlot).map((period: any) => (
-                                                <div key={period.id} style={{ color: period.backColor }}>
-                                                    {period.subjects.map((subject: any) => (
-                                                        <div key={subject.id}>{subject.name}</div>
-                                                    ))}
-                                                    {period.teachers.map((teacher: any) => (
-                                                        <div key={teacher.id}>{teacher.name}</div>
-                                                    ))}
-                                                    {period.classes.map((class_: any) => (
-                                                        <div key={class_.id}>{class_.name}</div>
-                                                    ))}
-                                                </div>
-                                            ))}
+                                            <div className="vc-untis-periods">
+                                                {getPeriodsAtWeekdayAndTime(index + 1, timeSlot).map((period: any) => (
+                                                    <div key={period.id} style={{ color: period.backColor }} className="vc-untis-period">
+                                                        <div>
+                                                            {period.subjects.map((subject: any) => (
+                                                                <div key={subject.id}>{subject.name}</div>
+                                                            ))}
+                                                        </div>
+                                                        <div>
+                                                            {period.teachers.map((teacher: any) => (
+                                                                <div key={teacher.id}>{teacher.name}</div>
+                                                            ))}
+                                                        </div>
+                                                        <div>
+                                                            {period.rooms.map((room: any) => (
+                                                                <div key={room.id}>{room.name}</div>
+                                                            ))}
+                                                        </div>
+                                                        <div>
+                                                            {period.classes.map((class_: any) => (
+                                                                <div key={class_.id}>{class_.name}</div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </td>
                                     ))}
                                 </tr>

@@ -10,6 +10,7 @@
     overflow: auto;
     border-radius: 10px;
     border: 1px solid #4d4d4d;
+    max-height: 100%;
 }
 
 .vc-untis::-webkit-scrollbar {
@@ -46,7 +47,7 @@
     align-items: center;
     aspect-ratio: 1/1;
     margin: 0 7px 7px 7px;
-    transition: background-color 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-radius 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: background-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-radius 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     border-radius: 25px;
 }
 
@@ -62,7 +63,7 @@
     align-items: center;
     color: var(--interactive-normal);
     cursor: pointer;
-    transition: 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     transform: scale(1) rotate(0deg);
 }
 
@@ -115,6 +116,7 @@
 
 .vc-untis-timetable tr {
     color: var(--interactive-normal);
+    height: 35px;
 }
 
 /* stylelint-disable-next-line no-descending-specificity */
@@ -146,4 +148,26 @@
 
 .vc-untis-error {
     color: var(--error);
+}
+
+.vc-untis-periods {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 5px;
+}
+
+.vc-untis-period {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.vc-untis-period > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 3px;
 }
