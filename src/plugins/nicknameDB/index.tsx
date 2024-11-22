@@ -7,18 +7,8 @@
 import { Devs } from "@utils/constants";
 import definePlugin from "@utils/types";
 
-
-definePlugin({
-
-    name: "NicknameDB",
-    description: "Lets you globally set nicknames for users and vote for the best ones.",
-    authors: [Devs.minikomo],
-
-
-    start() {
-
-
-
-    }
-
+export default definePlugin({
+    name: "name",
+    description: "description",
+    authors: [Devs.author],
 });
