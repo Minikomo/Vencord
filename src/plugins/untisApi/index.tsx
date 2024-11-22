@@ -273,7 +273,7 @@ export default definePlugin({
 
     renderUntisButton: ErrorBoundary.wrap(UntisButton, { noop: true }),
 
-    start() {
+    async start() {
         addServerListElement(ServerListRenderPosition.Above, this.renderUntisButton);
     },
 
