@@ -21,7 +21,7 @@ class WebUntisAPI {
     private secretKey: string;
     private authToken: string | null = null;
     private untisver: string = "arche";
-    private FullUntisIdData!: userApiData;
+    private fullUntisIdData!: userApiData;
     private typeuseage: string;
 
 
@@ -58,14 +58,14 @@ class WebUntisAPI {
         await this.cacheIdsToNames();
 
 
-        this.userID = this.FullUntisIdData.userData.elemId;
+        this.userID = this.fullUntisIdData.userData.elemId;
 
-        this.classID = this.FullUntisIdData.userData.klassenIds;
-        this.userFullName = this.FullUntisIdData.userData.displayName;
-        this.schoolName = this.FullUntisIdData.userData.schoolName;
+        this.classID = this.fullUntisIdData.userData.klassenIds;
+        this.userFullName = this.fullUntisIdData.userData.displayName;
+        this.schoolName = this.fullUntisIdData.userData.schoolName;
     }
     private async renameArray(liste: periodArray) {
-        var temp = new Getter(this.FullUntisIdData);
+        var temp = new Getter(this.fullUntisIdData);
         var returnliste = liste;
 
 
@@ -153,7 +153,7 @@ class WebUntisAPI {
             "getUserData2017",
             timetableParams
         );
-        this.FullUntisIdData = data;
+        this.fullUntisIdData = data;
 
     }
 
@@ -268,6 +268,11 @@ class WebUntisAPI {
     public getCurrentFriday(): string {
         const monday = new Date(this.getCurrentMonday());
         return new Date(monday.setDate(monday.getDate() + 5)).toISOString().split("T")[0];
+    }
+
+    // get FullUntisIdData
+    public getFullUntisIdData(): userApiData {
+        return this.fullUntisIdData;
     }
 }
 

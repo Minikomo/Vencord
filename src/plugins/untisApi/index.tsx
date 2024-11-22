@@ -210,6 +210,8 @@ const UntisButton = () => (
 
 const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
     const [timetable, setTimetable] = React.useState<any>(null);
+    const [error, setError] = React.useState<string | null>(null);
+    const [timeGrid, setTimeGrid] = React.useState<any>(null);
 
     React.useEffect(() => {
         const fetchTimetable = async () => {
@@ -223,13 +225,16 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                 );
                 await untis.setUp();
 
+                setTimeGrid(untis.getFullUntisIdData().masterData.timeGrid);
+                console.log(untis.getFullUntisIdData().masterData.timeGrid);
+
                 const timetable = await untis.getTimetable({ id: 1, type: settings.store.UntisType as "STUDENT" | "CLASS" | "ROOM", startDate: untis.getCurrentMonday(), endDate: untis.getCurrentFriday() });
                 setTimetable(timetable);
             } catch (error) {
                 if (error instanceof Error) {
-                    setTimetable({ error: error.message });
+                    setError(error.message);
                 } else {
-                    setTimetable({ error: String(error) });
+                    setError(String(error));
                 }
             }
         };
@@ -240,39 +245,486 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
     return (
         <ModalRoot className="vc-untis" {...rootProps}>
             <div className="vc-untis-modal">
-                {/* <ModalHeader className="vc-untis-modal-header">
-                    <h3>UntisAPI</h3>
-                </ModalHeader> */}
                 <div className="vc-untis-modal-content">
                     <table className="vc-untis-timetable">
                         <tr className="vc-untis-timetable-header">
+                            {/* Timegrid
+                            {
+    "days": [
+        {
+            "day": "MON",
+            "units": [
+                {
+                    "label": "",
+                    "startTime": "T07:30",
+                    "endTime": "T08:15"
+                },
+                {
+                    "label": "",
+                    "startTime": "T08:15",
+                    "endTime": "T09:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T09:15",
+                    "endTime": "T10:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T10:00",
+                    "endTime": "T10:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T11:15",
+                    "endTime": "T12:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T12:00",
+                    "endTime": "T12:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T13:00",
+                    "endTime": "T13:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T13:45",
+                    "endTime": "T14:30"
+                },
+                {
+                    "label": "",
+                    "startTime": "T14:50",
+                    "endTime": "T15:35"
+                },
+                {
+                    "label": "",
+                    "startTime": "T15:35",
+                    "endTime": "T16:20"
+                },
+                {
+                    "label": "",
+                    "startTime": "T16:30",
+                    "endTime": "T17:15"
+                },
+                {
+                    "label": "",
+                    "startTime": "T17:15",
+                    "endTime": "T18:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T18:00",
+                    "endTime": "T18:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T18:45",
+                    "endTime": "T19:30"
+                },
+                {
+                    "label": "",
+                    "startTime": "T19:50",
+                    "endTime": "T20:35"
+                },
+                {
+                    "label": "",
+                    "startTime": "T20:35",
+                    "endTime": "T21:20"
+                }
+            ]
+        },
+        {
+            "day": "TUE",
+            "units": [
+                {
+                    "label": "",
+                    "startTime": "T07:30",
+                    "endTime": "T08:15"
+                },
+                {
+                    "label": "",
+                    "startTime": "T08:15",
+                    "endTime": "T09:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T09:15",
+                    "endTime": "T10:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T10:00",
+                    "endTime": "T10:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T11:15",
+                    "endTime": "T12:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T12:00",
+                    "endTime": "T12:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T13:00",
+                    "endTime": "T13:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T13:45",
+                    "endTime": "T14:30"
+                },
+                {
+                    "label": "",
+                    "startTime": "T14:50",
+                    "endTime": "T15:35"
+                },
+                {
+                    "label": "",
+                    "startTime": "T15:35",
+                    "endTime": "T16:20"
+                },
+                {
+                    "label": "",
+                    "startTime": "T16:30",
+                    "endTime": "T17:15"
+                },
+                {
+                    "label": "",
+                    "startTime": "T17:15",
+                    "endTime": "T18:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T18:00",
+                    "endTime": "T18:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T18:45",
+                    "endTime": "T19:30"
+                },
+                {
+                    "label": "",
+                    "startTime": "T19:50",
+                    "endTime": "T20:35"
+                },
+                {
+                    "label": "",
+                    "startTime": "T20:35",
+                    "endTime": "T21:20"
+                }
+            ]
+        },
+        {
+            "day": "WED",
+            "units": [
+                {
+                    "label": "",
+                    "startTime": "T07:30",
+                    "endTime": "T08:15"
+                },
+                {
+                    "label": "",
+                    "startTime": "T08:15",
+                    "endTime": "T09:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T09:15",
+                    "endTime": "T10:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T10:00",
+                    "endTime": "T10:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T11:15",
+                    "endTime": "T12:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T12:00",
+                    "endTime": "T12:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T13:00",
+                    "endTime": "T13:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T13:45",
+                    "endTime": "T14:30"
+                },
+                {
+                    "label": "",
+                    "startTime": "T14:50",
+                    "endTime": "T15:35"
+                },
+                {
+                    "label": "",
+                    "startTime": "T15:35",
+                    "endTime": "T16:20"
+                },
+                {
+                    "label": "",
+                    "startTime": "T16:30",
+                    "endTime": "T17:15"
+                },
+                {
+                    "label": "",
+                    "startTime": "T17:15",
+                    "endTime": "T18:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T18:00",
+                    "endTime": "T18:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T18:45",
+                    "endTime": "T19:30"
+                },
+                {
+                    "label": "",
+                    "startTime": "T19:50",
+                    "endTime": "T20:35"
+                },
+                {
+                    "label": "",
+                    "startTime": "T20:35",
+                    "endTime": "T21:20"
+                }
+            ]
+        },
+        {
+            "day": "THU",
+            "units": [
+                {
+                    "label": "",
+                    "startTime": "T07:30",
+                    "endTime": "T08:15"
+                },
+                {
+                    "label": "",
+                    "startTime": "T08:15",
+                    "endTime": "T09:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T09:15",
+                    "endTime": "T10:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T10:00",
+                    "endTime": "T10:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T11:15",
+                    "endTime": "T12:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T12:00",
+                    "endTime": "T12:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T13:00",
+                    "endTime": "T13:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T13:45",
+                    "endTime": "T14:30"
+                },
+                {
+                    "label": "",
+                    "startTime": "T14:50",
+                    "endTime": "T15:35"
+                },
+                {
+                    "label": "",
+                    "startTime": "T15:35",
+                    "endTime": "T16:20"
+                },
+                {
+                    "label": "",
+                    "startTime": "T16:30",
+                    "endTime": "T17:15"
+                },
+                {
+                    "label": "",
+                    "startTime": "T17:15",
+                    "endTime": "T18:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T18:00",
+                    "endTime": "T18:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T18:45",
+                    "endTime": "T19:30"
+                },
+                {
+                    "label": "",
+                    "startTime": "T19:50",
+                    "endTime": "T20:35"
+                },
+                {
+                    "label": "",
+                    "startTime": "T20:35",
+                    "endTime": "T21:20"
+                }
+            ]
+        },
+        {
+            "day": "FRI",
+            "units": [
+                {
+                    "label": "",
+                    "startTime": "T07:30",
+                    "endTime": "T08:15"
+                },
+                {
+                    "label": "",
+                    "startTime": "T08:15",
+                    "endTime": "T09:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T09:15",
+                    "endTime": "T10:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T10:00",
+                    "endTime": "T10:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T11:15",
+                    "endTime": "T12:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T12:00",
+                    "endTime": "T12:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T13:00",
+                    "endTime": "T13:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T13:45",
+                    "endTime": "T14:30"
+                },
+                {
+                    "label": "",
+                    "startTime": "T14:50",
+                    "endTime": "T15:35"
+                },
+                {
+                    "label": "",
+                    "startTime": "T15:35",
+                    "endTime": "T16:20"
+                },
+                {
+                    "label": "",
+                    "startTime": "T16:30",
+                    "endTime": "T17:15"
+                },
+                {
+                    "label": "",
+                    "startTime": "T17:15",
+                    "endTime": "T18:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T18:00",
+                    "endTime": "T18:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T18:45",
+                    "endTime": "T19:30"
+                },
+                {
+                    "label": "",
+                    "startTime": "T19:50",
+                    "endTime": "T20:35"
+                },
+                {
+                    "label": "",
+                    "startTime": "T20:35",
+                    "endTime": "T21:20"
+                }
+            ]
+        },
+        {
+            "day": "SAT",
+            "units": [
+                {
+                    "label": "",
+                    "startTime": "T07:30",
+                    "endTime": "T08:15"
+                },
+                {
+                    "label": "",
+                    "startTime": "T08:15",
+                    "endTime": "T09:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T09:15",
+                    "endTime": "T10:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T10:00",
+                    "endTime": "T10:45"
+                },
+                {
+                    "label": "",
+                    "startTime": "T11:15",
+                    "endTime": "T12:00"
+                },
+                {
+                    "label": "",
+                    "startTime": "T12:00",
+                    "endTime": "T12:45"
+                }
+            ]
+        }
+    ]
+}
+                            */}
                             <th>Time</th>
-                            <th>Monday</th>
-                            <th>Tuesday</th>
-                            <th>Wednesday</th>
-                            <th>Thursday</th>
-                            <th>Friday</th>
+                            {timeGrid?.days.map((day: any) => (
+                                <th key={day.day}>{day.day}</th>
+                            ))}
                         </tr>
-                        {timetable ? (
-                            timetable.periods.map((period: any, index: number) => (
-                                <tr key={index} className="vc-untis-timetable-row">
-                                    <td>{period.startDateTime}</td>
-                                    {period.subjects.map((subject: any) => (
-                                        <td key={subject.id}>{subject.name}</td>
-                                    ))}
-                                    {period.rooms.map((room: any) => (
-                                        <td key={room.id}>{room.name}</td>
-                                    ))}
-                                    {period.teachers.map((teacher: any) => (
-                                        <td key={teacher.id}>{teacher.name}</td>
-                                    ))}
-                                </tr>
-                            ))
-                        ) : (
-                            <tr className="vc-untis-timetable-row">
-                                <td colSpan={6}>Loading...</td>
+                        {timetable?.periods.map((period: any) => (
+                            <tr key={period.id} className="vc-untis-timetable-period">
+                                <td>{period.startDateTime}</td>
+
                             </tr>
-                        )}
+                        ))}
                     </table>
                 </div>
             </div>
