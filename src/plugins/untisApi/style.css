@@ -300,6 +300,22 @@
     font-size: 20px;
     font-weight: bold;
     color: var(--text-normal);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.vc-untis-week-today {
+    background-color: var(--background-secondary);
+    border-radius: 10px;
+    padding: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), padding 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    color: var(--text-normal);
+    font-weight: bold;
+    font-size: 18px;
+    text-align: center;
 }
 
 .vc-untis-single-lesson {

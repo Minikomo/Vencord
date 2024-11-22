@@ -361,7 +361,9 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                     {/* change weeks */}
                     <div className="vc-untis-week">
                         <div className="vc-untis-week-button" onClick={handlePreviousWeek}>{"←"}</div>
-                        <div className="vc-untis-week-text">KW {currentWeek} ({untis.getMondayOfCalendarWeek(currentWeek, new Date().getFullYear())} - {untis.getFridayOfCalendarWeek(currentWeek, new Date().getFullYear())})</div>
+                        <div className="vc-untis-week-text">KW {currentWeek} ({untis.getMondayOfCalendarWeek(currentWeek, new Date().getFullYear())} - {untis.getFridayOfCalendarWeek(currentWeek, new Date().getFullYear())})
+                            <div className="vc-untis-week-today" onClick={() => setCurrentWeek(untis.getCurrentCalendarWeek())}>Today: {new Date().toLocaleDateString()}</div>
+                        </div>
                         <div className="vc-untis-week-button" onClick={handleNextWeek}>{"→"}</div>
                     </div>
 
@@ -429,6 +431,7 @@ const SingleLessonModalContent = ({ rootProps, period }: { rootProps: ModalProps
                 <p>Teacher: {period.teachers[0].name} ({period.teachers[0].longName})</p>
                 <p>Room: {period.rooms[0].name} ({period.rooms[0].longName})</p>
                 <p>Class: {period.classes[0].name} ({period.classes[0].longName})</p>
+                <p>Is: {period.is[0]}</p>
 
                 {period.homeWorks
                     .filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0])
