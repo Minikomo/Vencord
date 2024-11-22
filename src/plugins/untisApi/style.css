@@ -1,3 +1,37 @@
+
+.vc-untis {
+    position: fixed;
+    z-index: 1000;
+    left: 40px;
+    top: 40px;
+    width: calc(100% - 80px);
+    height: calc(100% - 80px);
+    overflow: auto;
+    border-radius: 10px;
+    border: 1px solid #4d4d4d;
+}
+
+.vc-untis::-webkit-scrollbar {
+    width: 10px;
+}
+
+.vc-untis::-webkit-scrollbar-thumb {
+    background: var(--interactive-normal);
+    border-radius: 10px;
+}
+
+.vc-untis::-webkit-scrollbar-track {
+    background: var(--background-secondary);
+}
+
+.vc-untis::-webkit-scrollbar-thumb:hover {
+    background: var(--interactive-active);
+}
+
+.vc-untis::-webkit-scrollbar-button {
+    display: none;
+}
+
 .vc-untis-button {
     width: 100%;
     box-sizing: border-box;
@@ -41,4 +75,33 @@
     100% {
         transform: rotate(0deg) scale(1);
     }
+}
+
+.vc-untis-timetable {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.vc-untis-timetable-header {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 10px;
+    background: var(--background-secondary);
+    border-bottom: 1px solid var(--background-tertiary);
+    font-weight: bold;
+}
+
+
+.vc-untis-timetable-row {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 10px;
+    background: var(--background-primary);
+    border-bottom: 1px solid var(--background-tertiary);
+    color: var(--text-normal);
 }

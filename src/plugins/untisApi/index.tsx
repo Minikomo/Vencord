@@ -10,7 +10,7 @@ import { addServerListElement, removeServerListElement, ServerListRenderPosition
 import { definePluginSettings } from "@api/Settings";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/constants";
-import { ModalHeader, ModalProps, ModalRoot, openModal } from "@utils/modal";
+import { ModalProps, ModalRoot, openModal } from "@utils/modal";
 import definePlugin, { OptionType } from "@utils/types";
 import { Button, React } from "@webpack/common";
 
@@ -239,26 +239,42 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
     }, []);
 
     return (
-        <ModalRoot {...rootProps}>
+        <ModalRoot className="vc-untis" {...rootProps}>
             <div className="vc-untis-modal">
-                <ModalHeader className="vc-untis-modal-header">
+                {/* <ModalHeader className="vc-untis-modal-header">
                     <h3>UntisAPI</h3>
-                </ModalHeader>
+                </ModalHeader> */}
                 <div className="vc-untis-modal-content">
-                    <p>Current lesson:</p>
-                    <pre>
+                    <table className="vc-untis-timetable">
+                        <tr className="vc-untis-timetable-header">
+                            <th>Time</th>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                        </tr>
                         {timetable ? (
                             timetable.periods.map((period: any, index: number) => (
-                                <div key={index}>
+                                <tr key={index} className="vc-untis-timetable-row">
+                                    <td>{period.startDateTime}</td>
                                     {period.subjects.map((subject: any) => (
-                                        <div key={subject.id}>{subject.name} start at {period.startDateTime} and ends at {period.endDateTime}</div>
+                                        <td key={subject.id}>{subject.name}</td>
                                     ))}
-                                </div>
+                                    {period.rooms.map((room: any) => (
+                                        <td key={room.id}>{room.name}</td>
+                                    ))}
+                                    {period.teachers.map((teacher: any) => (
+                                        <td key={teacher.id}>{teacher.name}</td>
+                                    ))}
+                                </tr>
                             ))
                         ) : (
-                            "Loading..."
+                            <tr className="vc-untis-timetable-row">
+                                <td colSpan={6}>Loading...</td>
+                            </tr>
                         )}
-                    </pre>
+                    </table>
                 </div>
             </div>
         </ModalRoot>
