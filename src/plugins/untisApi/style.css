@@ -1,3 +1,4 @@
+/* stylelint-disable shorthand-property-no-redundant-values */
 /* stylelint-disable rule-empty-line-before */
 .vc-untis {
     position: fixed;
@@ -38,42 +39,37 @@
     box-sizing: border-box;
 }
 
+.vc-untis-button-content {
+    background-color: var(--background-secondary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1/1;
+    margin: 0 7px 7px 7px;
+    transition: background-color 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-radius 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border-radius: 25px;
+}
+
+.vc-untis-button-content:hover {
+    background-color: #fe6033;
+    border-radius: 15px;
+}
+
 .untis-button {
     background: none; /* Removes any default white background */
-    width: 48px;
-    height: 48px;
+    width: 28px;
+    height: 28px;
     align-items: center;
     color: var(--interactive-normal);
     cursor: pointer;
     transition: 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    margin-top: 2px;
-    margin-bottom: 2px;
     transform: scale(1) rotate(0deg);
 }
 
-.untis-button:hover {
+.vc-untis-button-content:hover .untis-button {
     color: var(--interactive-active);
     transition: cubic-bezier(0.075, 0.82, 0.165, 1) 500ms;
     transform: rotate(10deg) scale(1.08);
-}
-
-/* Keyframes */
-@keyframes wiggle {
-    0% {
-        transform: rotate(0deg);
-    }
-    25% {
-        transform: rotate(10deg) scale(1.08);
-    }
-    50% {
-        transform: rotate(-10deg) scale(1.08);
-    }
-    75% {
-        transform: rotate(10deg) scale(1.08);
-    }
-    100% {
-        transform: rotate(0deg) scale(1);
-    }
 }
 
 /* Timetable Styles */
