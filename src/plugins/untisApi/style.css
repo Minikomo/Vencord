@@ -81,11 +81,11 @@
 }
 
 .vc-untis-timetable {
-    display: flex;
-    flex-direction: column;
     width: 100%;
     height: 100%;
     overflow: auto;
+    margin: 0;
+    padding: 0;
 }
 
 .vc-untis-timetable-header {
@@ -93,30 +93,33 @@
     display: flex;
     justify-content: space-evenly;
     align-items : center;
-    padding: 10px;
-    background: var(--background-secondary);
     border-bottom: 1px solid var(--background-tertiary);
     font-weight: bold;
+    background: var(--background-tertiary);
+    position: sticky;
+    top: 0;
 }
 
 
-.vc-untis-timetable-row {
+.vc-untis-timetable tr {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    padding: 10px;
-    background: var(--background-primary);
-    border-bottom: 1px solid var(--background-tertiary);
     color: var(--interactive-normal);
 }
 
-.vc-untis-timetable-row:hover {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
+.vc-untis-timetable td,
+.vc-untis-timetable th {
+    width: 100%;
+    text-align: center;
     padding: 10px;
-    background: var(--background-secondary);
-    border-bottom: 1px solid var(--background-tertiary);
-    color: var(--interactive-active);
 }
 
+.vc-untis-timetable td:hover {
+    background: var(--background-tertiary);
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.vc-untis-timetable td {
+    border-right: 1px solid var(--background-tertiary);
+}
