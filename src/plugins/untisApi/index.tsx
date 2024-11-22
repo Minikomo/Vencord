@@ -354,7 +354,7 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                         <td key={index + 1}>
                                             <div className="vc-untis-periods">
                                                 {getPeriodsAtWeekdayAndTime(index + 1, timeSlot).map((period: any) => (
-                                                    <div key={period.id} style={{ color: period.backColor }} className="vc-untis-period">
+                                                    <div key={period.id} style={{ color: period.subjects[0].backColor }} className={"vc-untis-period " + period.is[0]}>
                                                         <div>
                                                             {period.subjects.map((subject: any) => (
                                                                 <div key={subject.id} title={subject.longName}>{subject.name}</div>

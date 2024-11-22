@@ -1,3 +1,4 @@
+/* stylelint-disable selector-class-pattern */
 /* stylelint-disable shorthand-property-no-redundant-values */
 /* stylelint-disable rule-empty-line-before */
 .vc-untis {
@@ -152,6 +153,10 @@
     height: 35px;
 }
 
+.vc-untis-timetable tr:not(:first-child) {
+    height: 110px;
+}
+
 /* stylelint-disable-next-line no-descending-specificity */
 .vc-untis-timetable td {
     border: 1px solid var(--background-tertiary);
@@ -195,6 +200,7 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
+    width: 100%;
 }
 
 .vc-untis-period > div {
@@ -205,3 +211,33 @@
     gap: 3px;
 }
 
+
+.REGULAR::before {
+    content: 'REGULAR';
+    background-color: color-mix(in srgb, #0f4 12.3%, transparent);
+    color: white;
+    padding: 2px 5px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.CANCELLED::before {
+    content: 'CANCELLED';
+    background-color: color-mix(in srgb, #f04 12.3%, transparent);
+    color: white;
+    padding: 2px 5px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.IRREGULAR::before {
+    content: 'IRREGULAR';
+    background-color: color-mix(in srgb, #f90 12.3%, transparent);
+    color: white;
+    padding: 2px 5px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: bold;
+}
