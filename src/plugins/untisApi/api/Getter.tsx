@@ -55,11 +55,11 @@ class Getter {
         return temp?.longName ?? "";
     }
     public getbackColorCodeFromID(id: number): string {
-        const temp = this.arraythingy.masterData.klassen.find(klass => klass.id === id);
+        const temp = this.arraythingy.masterData.subjects.find(klass => klass.id === id);
         return temp?.backColor ?? "";
     }
     public getforeColorCodeFromID(id: number): string {
-        const temp = this.arraythingy.masterData.klassen.find(klass => klass.id === id);
+        const temp = this.arraythingy.masterData.subjects.find(klass => klass.id === id);
         return temp?.foreColor ?? "";
     }
 }

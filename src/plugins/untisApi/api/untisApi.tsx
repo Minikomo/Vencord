@@ -76,8 +76,8 @@ class WebUntisAPI {
             period.rooms = [] as _Room[];
             period.startDateTimeUnix = new Date(period.startDateTime).getTime();
             period.endDateTimeUnix = new Date(period.endDateTime).getTime();
-            period.backColor = temp.getbackColorCodeFromID(period.classes![0].id);
-            period.foreColor = temp.getforeColorCodeFromID(period.classes![0].id);
+
+
 
             period.elements.forEach(element2 => {
 
@@ -88,7 +88,9 @@ class WebUntisAPI {
                         id: element2.id,
                         orgId: element2.orgId,
                         name: temp.getSubjectNameFromID(element2.id),
-                        longName: temp.getSubjectLongNameFromID(element2.id)
+                        longName: temp.getSubjectLongNameFromID(element2.id),
+                        foreColor: temp.getforeColorCodeFromID(element2.id),
+                        backColor: temp.getbackColorCodeFromID(element2.id)
                     };
                     period.subjects?.push(tempSubject);
                 }
@@ -128,6 +130,7 @@ class WebUntisAPI {
 
 
             });
+
         });
         return returnliste;
     }

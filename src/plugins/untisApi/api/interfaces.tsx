@@ -32,6 +32,8 @@ export interface _Subject {
     orgId: number;
     name: string | undefined;
     longName: string | undefined;
+    foreColor: string;
+    backColor: string;
 }
 
 export interface _Room {
