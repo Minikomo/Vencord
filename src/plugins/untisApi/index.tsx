@@ -281,9 +281,23 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
             const unit = units[j];
             const nextUnit = units[j + 1];
             if (unit.end === nextUnit.start) {
-                unit.end = nextUnit.end;
-                units.splice(j + 1, 1);
-                j--;
+                const periodsAtCurrentTime = getPeriodsAtWeekdayAndTime(i + 1, unit.start);
+                const periodsAtNextTime = getPeriodsAtWeekdayAndTime(i + 1, nextUnit.start);
+
+                const sameSubjectAndRoom = periodsAtCurrentTime.every((period: any) =>
+                    periodsAtNextTime.some((nextPeriod: any) =>
+                        period.subjects[0].id === nextPeriod.subjects[0].id &&
+                        period.rooms[0].id === nextPeriod.rooms[0].id &&
+                        period.teachers[0].id === nextPeriod.teachers[0].id &&
+                        period.classes[0].id === nextPeriod.classes[0].id
+                    )
+                );
+
+                if (sameSubjectAndRoom) {
+                    unit.end = nextUnit.end;
+                    units.splice(j + 1, 1);
+                    j--;
+                }
             }
         }
     }
@@ -294,8 +308,6 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
             timeGrid.days.flatMap((day: any) => day.units.map((unit: any) => unit.start))
         )
     ).sort();
-
-    console.log(timeSlots);
 
     // entfernt samstag, wenn dort kein unterricht ist
     if (getPeriodsAtWeekday(5).length === 0) {
@@ -316,6 +328,8 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
             return startDateTime.getDay() === weekday && startDateTime.toISOString().includes(time);
         });
     }
+
+    console.log(getPeriodsAtWeekday(1));
 
     return (
         <ModalRoot className="vc-untis" {...rootProps}>
@@ -343,22 +357,22 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                                     <div key={period.id} style={{ color: period.backColor }} className="vc-untis-period">
                                                         <div>
                                                             {period.subjects.map((subject: any) => (
-                                                                <div key={subject.id}>{subject.name}</div>
+                                                                <div key={subject.id} title={subject.longName}>{subject.name}</div>
                                                             ))}
                                                         </div>
                                                         <div>
                                                             {period.teachers.map((teacher: any) => (
-                                                                <div key={teacher.id}>{teacher.name}</div>
+                                                                <div key={teacher.id} title={teacher.longName}>{teacher.name}</div>
                                                             ))}
                                                         </div>
                                                         <div>
                                                             {period.rooms.map((room: any) => (
-                                                                <div key={room.id}>{room.name}</div>
+                                                                <div key={room.id} title={room.longName}>{room.name}</div>
                                                             ))}
                                                         </div>
                                                         <div>
                                                             {period.classes.map((class_: any) => (
-                                                                <div key={class_.id}>{class_.name}</div>
+                                                                <div key={class_.id} title={class_.longName}>{class_.name}</div>
                                                             ))}
                                                         </div>
                                                     </div>
