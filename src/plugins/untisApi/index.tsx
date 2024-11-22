@@ -92,7 +92,7 @@ const settings = definePluginSettings({
         description: "What time table do you want to use",
         options: [
             {
-                label: "StudentPENIS",
+                label: "Student",
                 value: "STUDENT",
                 default: true
             },
