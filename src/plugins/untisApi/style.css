@@ -108,6 +108,14 @@
     transform: rotate(10deg) scale(1.08);
 }
 
+.vc-untis-modal {
+    height: 100%;
+}
+
+.vc-untis-modal-content {
+    height: 100%;
+}
+
 /* Timetable Styles */
 .vc-untis-timetable {
     width: 100%;
