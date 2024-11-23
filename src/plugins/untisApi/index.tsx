@@ -349,12 +349,6 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         });
     }
 
-    function getHolidayAtDate(date: string) {
-        console.log(holidays);
-        console.log(holidays.find((holiday: any) => holiday.startDate <= date && date <= holiday.endDate));
-        return holidays.find((holiday: any) => holiday.startDate <= date && date <= holiday.endDate);
-    }
-
     function getHolidyByWeekAndWeekdayAndYear(week: number, weekday: number, year: number) {
         return holidays.find((holiday: any) => {
             const start = new Date(holiday.startDate);
@@ -378,8 +372,8 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                     {/* change weeks */}
                     <div className="vc-untis-week">
                         <div className="vc-untis-week-button" onClick={handlePreviousWeek}>{"←"}</div>
-                        <div className="vc-untis-week-text">KW {currentWeek} ({untis.getMondayOfCalendarWeek(currentWeek, new Date().getFullYear())} - {untis.getFridayOfCalendarWeek(currentWeek, new Date().getFullYear())})
-                            <div className="vc-untis-week-today" onClick={() => setCurrentWeek(untis.getCurrentCalendarWeek())}>Today: {new Date().toLocaleDateString()}</div>
+                        <div className="vc-untis-week-text">
+                            <input type="week" value={`${new Date().getFullYear()}-W${String(currentWeek).padStart(2, "0")}`} onChange={e => setCurrentWeek(parseInt(e.target.value.split("-W")[1]))} className="vc-untis-week-input" id="week" />
                         </div>
                         <div className="vc-untis-week-button" onClick={handleNextWeek}>{"→"}</div>
                     </div>
@@ -388,9 +382,13 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                         <thead>
                             <tr>
                                 <th>Time</th>
-                                {timeGrid.days.map((day: any) => (
-                                    <th key={day.day}>{day.day}</th>
-                                ))}
+                                {timeGrid.days.map((day: any, index: number) => {
+                                    const date = new Date(untis.getMondayOfCalendarWeek(currentWeek, new Date().getFullYear()));
+                                    date.setDate(date.getDate() + index + 1);
+                                    return (
+                                        <th key={day.day}>{day.day} {date.getDate().toString().padStart(2, "0")}.{(date.getMonth() + 1).toString().padStart(2, "0")}</th>
+                                    );
+                                })}
                             </tr>
                         </thead>
                         <tbody>
@@ -403,24 +401,25 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                         <td key={index + 1}>
                                             <div className="vc-untis-periods">
                                                 {getPeriodsAtWeekdayAndTime(index + 1, timeSlot).map((period: any) => (
-                                                    <div key={period.id} style={{ color: period.subjects[0].backColor }} className={`vc-untis-period ${period.is[0]} ${period.homeWorks.filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0]).length > 0 ? "HOMEWORK" : ""}`} onClick={() => openSingleLessonModal(period)}>
+                                                    <div key={period.id} style={{ color: period.subjects?.[0]?.backColor || "#f1f1f1" }} className={`vc-untis-period ${period.is[0]} ${period.homeWorks.filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0]).length > 0 ? "HOMEWORK" : ""} ${period.exam ? "EXAM" : ""}`
+                                                    } onClick={() => openSingleLessonModal(period)}>
                                                         <div>
-                                                            {period.subjects.map((subject: any) => (
+                                                            {period.subjects?.map((subject: any) => (
                                                                 <div key={subject.id} title={subject.longName}>{subject.name}</div>
                                                             ))}
                                                         </div>
                                                         <div>
-                                                            {period.teachers.map((teacher: any) => (
+                                                            {period.teachers?.map((teacher: any) => (
                                                                 <div key={teacher.id} title={teacher.longName}>{teacher.name}</div>
                                                             ))}
                                                         </div>
                                                         <div>
-                                                            {period.rooms.map((room: any) => (
+                                                            {period.rooms?.map((room: any) => (
                                                                 <div key={room.id} title={room.longName}>{room.name}</div>
                                                             ))}
                                                         </div>
                                                         <div>
-                                                            {period.classes.map((class_: any) => (
+                                                            {period.classes?.map((class_: any) => (
                                                                 <div key={class_.id} title={class_.longName}>{class_.name}</div>
                                                             ))}
                                                         </div>
@@ -447,14 +446,38 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
 
 
 const SingleLessonModalContent = ({ rootProps, period }: { rootProps: ModalProps; period: any; }) => {
+
     return (
         <ModalRoot {...rootProps}>
             <div className="vc-untis-single-lesson">
                 <h2>{period.subjects[0].name} ({period.subjects[0].longName})</h2>
-                <p>Teacher: {period.teachers[0].name} ({period.teachers[0].longName})</p>
-                <p>Room: {period.rooms[0].name} ({period.rooms[0].longName})</p>
-                <p>Class: {period.classes[0].name} ({period.classes[0].longName})</p>
-                <p>Is: {period.is[0]}</p>
+                <p><b>Teacher:</b> {period.teachers.map((teacher: any) => `${teacher.name} (${teacher.longName})`).join(", ")}</p>
+                <p><b>Room:</b> {period.rooms.map((room: any) => `${room.name} (${room.longName})`).join(", ")}</p>
+                <p><b>Class:</b> {period.classes.map((class_: any) => (
+                    <span key={class_.id} title={class_.longName}>{class_.name}</span>
+                )).reduce((prev, curr) => [prev, ", ", curr])}</p>
+                <p><b>Is:</b> {period.is[0]}</p>
+
+                {period.text.lesson && (
+                    <div className="vc-untis-single-lesson-text">
+                        <h3>Lesson</h3>
+                        <p>{period.text.lesson}</p>
+                    </div>
+                )}
+
+                {period.text.substitution && (
+                    <div className="vc-untis-single-lesson-text">
+                        <h3>Substitution</h3>
+                        <p>{period.text.substitution}</p>
+                    </div>
+                )}
+
+                {period.text.info && (
+                    <div className="vc-untis-single-lesson-text">
+                        <h3>Info</h3>
+                        <p>{period.text.info}</p>
+                    </div>
+                )}
 
                 {period.homeWorks
                     .filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0])

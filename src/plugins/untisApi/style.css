@@ -296,16 +296,6 @@
     transform: translateY(1px);
 }
 
-.vc-untis-week-text {
-    font-size: 20px;
-    font-weight: bold;
-    color: var(--text-normal);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-}
-
 .vc-untis-week-today {
     background-color: var(--background-secondary);
     border-radius: 10px;
@@ -357,4 +347,35 @@
 
 .vc-untis-holiday {
     color: var(--text-normal);
+}
+
+.vc-untis-single-lesson-text {
+    margin-top: 20px;
+}
+
+.vc-untis-single-lesson-text h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: var(--text-normal);
+}
+
+.vc-untis-single-lesson-text p {
+    margin-left: 10px;
+}
+
+.vc-untis-week-text input {
+    width: 100%;
+    padding: 5px;
+    border-radius: 10px;
+    border: 1px solid var(--background-tertiary);
+    color: var(--text-normal);
+    font-size: 16px;
+    margin-bottom: 10px;
+    background-color: var(--background-secondary);
+    font-weight: bold;
+}
+
+.vc-untis-week-text input::placeholder {
+    color: var(--text-secondary);
 }
