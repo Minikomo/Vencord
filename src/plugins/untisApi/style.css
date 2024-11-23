@@ -68,12 +68,12 @@
     box-shadow: 1px 0 2px white;
     background-color: white;
     border-radius: 1px 4px 4px 0;
-    transition: background-color 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    height 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    top 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    width 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    margin-left 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    box-shadow 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: background-color 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    height 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    top 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    width 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    margin-left 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
 
 }
