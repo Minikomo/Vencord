@@ -516,7 +516,7 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                         <div>{`${String(timeSlot)} - ${timeGrid.days[0].units.find((unit: any) => unit.start === timeSlot)?.end || ""}`}</div>
                                     </td>
                                     {timeGrid.days.map((day: any, index: number) => (
-                                        <td key={index + 1}>
+                                        <td key={index + 1} className={`${new Date() > new Date(`${currentDate.toISOString().split("T")[0]}T${timeSlot}`) ? "PAST" : ""} ${new Date() >= new Date(`${currentDate.toISOString().split("T")[0]}T${timeSlot}`) && new Date() < new Date(`${currentDate.toISOString().split("T")[0]}T${timeGrid.days[0].units.find((unit: any) => unit.start === timeSlot)?.end}`) ? "CURRENT" : ""}`}>
                                             <div className="vc-untis-periods">
                                                 {getPeriodsAtWeekdayAndTime(index + 1, timeSlot).map((period: any) => (
                                                     <div key={period.id} style={{ color: period.subjects?.[0]?.backColor || "#f1f1f1" }} className={`vc-untis-period ${period.is[0]} ${period.homeWorks.filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0]).length > 0 ? "HOMEWORK" : ""} ${period.exam ? "EXAM" : ""}`

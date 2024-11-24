@@ -266,6 +266,26 @@
     font-weight: bold;
 }
 
+td.PAST {
+    background-color: color-mix(in srgb, var(--background-secondary) 50.3%, #030407) !important;
+    color: var(--text-secondary) !important;
+}
+
+td.PAST:hover {
+    background-color: color-mix(in srgb, var(--background-primary) 50.3%, #030407) !important;
+    color: var(--text-secondary) !important;
+}
+
+td.CURRENT {
+    background-color: color-mix(in srgb, var(--background-secondary) 90.9%, #0ba03380) !important;
+    color: var(--text-normal) !important;
+}
+
+td.CURRENT:hover {
+    background-color: color-mix(in srgb, var(--background-primary) 90.9%, #0ba03380) !important;
+    color: var(--text-normal) !important;
+}
+
 .vc-untis-week {
     display: flex;
     justify-content: space-between;
