@@ -8,15 +8,26 @@ import "./style.css";
 
 import { addServerListElement, removeServerListElement, ServerListRenderPosition } from "@api/ServerList";
 import { definePluginSettings } from "@api/Settings";
+import { getUserSettingLazy } from "@api/UserSettings";
 import { Link } from "@components/Link";
 import { Devs } from "@utils/constants";
 import { Margins } from "@utils/margins";
 import { ModalProps, ModalRoot, openModal } from "@utils/modal";
+import { useAwaiter } from "@utils/react";
 import definePlugin, { OptionType } from "@utils/types";
-import { Button, Forms, React } from "@webpack/common";
+import { findByCodeLazy, findComponentByCodeLazy } from "@webpack";
+import { ApplicationAssetUtils, Button, FluxDispatcher, Forms, GuildStore, React, SelectedChannelStore, SelectedGuildStore, UserStore } from "@webpack/common";
 
 import WebUntisAPI from "./api/untisApi";
 
+const useProfileThemeStyle = findByCodeLazy("profileThemeStyle:", "--profile-gradient-primary-color");
+const ActivityComponent = findComponentByCodeLazy("onOpenGameProfile");
+const ShowCurrentGame = getUserSettingLazy<boolean>("status", "showCurrentGame")!;
+
+async function getApplicationAsset(key: string): Promise<string> {
+    if (/https?:\/\/(cdn|media)\.discordapp\.(com|net)\/attachments\//.test(key)) return "mp:" + key.replace(/https?:\/\/(cdn|media)\.discordapp\.(com|net)\//, "");
+    return (await ApplicationAssetUtils.fetchAssetIds(settings.store.AppID!, [key]))[0];
+}
 
 
 interface ActivityAssets {
@@ -112,7 +123,8 @@ const settings = definePluginSettings({
         type: OptionType.STRING,
         name: "App ID",
         description: "Your Discord Bot application ID (required for Discord RPC)",
-        defaultValue: ""
+        defaultValue: "",
+        onChange: onChange
     },
     EnableDiscordRPC: {
         type: OptionType.BOOLEAN,
@@ -129,8 +141,7 @@ const settings = definePluginSettings({
         options: [
             {
                 label: "Playing",
-                value: ActivityType.PLAYING,
-                default: true
+                value: ActivityType.PLAYING
             },
             {
                 label: "Streaming",
@@ -138,7 +149,8 @@ const settings = definePluginSettings({
             },
             {
                 label: "Listening",
-                value: ActivityType.LISTENING
+                value: ActivityType.LISTENING,
+                default: true
             },
             {
                 label: "Watching",
@@ -155,14 +167,16 @@ const settings = definePluginSettings({
         name: "Name",
         defaultValue: "{lesson}",
         default: "{lesson}",
-        description: "The name of the activity"
+        description: "The name of the activity (supports placeholders)",
+        onChange: onChange
     },
     Description: {
         type: OptionType.STRING,
         name: "Description",
         defaultValue: "In room {room}",
-        default: "In room {room}",
-        description: "The description of the activity"
+        default: "{room}",
+        description: "The description of the activity (supports placeholders)",
+        onChange: onChange
     }
 });
 
@@ -170,27 +184,77 @@ function onChange() {
     dispatchActivityUpdate();
 }
 
+async function createActivity(): Promise<Activity | undefined> {
+    if (!settings.store.EnableDiscordRPC) {
+        return undefined;
+    }
 
-function dispatchActivityUpdate() {
-    // try {
-    //     FluxDispatcher.dispatch({
-    //         type: "LOCAL_ACTIVITY_UPDATE",
-    //         activity: {
-    //             application_id: "",
-    //             flags: 1,
-    //             name: "Mathe",
-    //             details: "In Raum 123",
-    //             type: 2,
-    //             timestamps: {
-    //                 start: Date.now() - 1000 * 60 * 15,
-    //                 end: Date.now() + 1000 * 60 * 30
-    //             }
-    //         },
-    //         socketId: "CustomRPC",
-    //     });
-    // } catch (error) {
-    //     console.error("Error fetching timetable:", error);
-    // }
+    if (!settings.store.AppID) {
+        return undefined;
+    }
+
+    if (!settings.store.Name) {
+        return undefined;
+    }
+
+    const untis = new WebUntisAPI(
+        settings.store.School || "defaultSchool",
+        settings.store.UntisUsername || "defaultUsername",
+        settings.store.Key || "defaultKey",
+        settings.store.Untisver || "arche",
+        settings.store.UntisType || "STUDENT"
+    );
+
+    try {
+        await untis.setUp();
+    } catch (error) {
+        console.error("Error setting up Untis:", error);
+        return undefined;
+    }
+
+    const currentLesson = await untis.getCurrentLesson();
+
+    if (!currentLesson) {
+        return undefined;
+    }
+
+    return {
+        application_id: settings.store.AppID || "",
+        flags: 1,
+        name: settings.store.Name?.replace("{lesson}", currentLesson.subjects?.[0]?.name || "Unknown Lesson")
+            .replace("{lesson_long}", currentLesson.subjects?.[0]?.longName || "Unknown Lesson")
+            .replace("{room}", currentLesson.rooms?.[0]?.name || "Unknown Room")
+            .replace("{room_long}", currentLesson.rooms?.[0]?.longName || "Unknown Room")
+            || "Unknown Activity",
+        details: settings.store.Description?.replace("{lesson}", currentLesson.subjects?.[0]?.name || "Unknown Lesson")
+            .replace("{lesson_long}", currentLesson.subjects?.[0]?.longName || "Unknown Lesson")
+            .replace("{room}", currentLesson.rooms?.[0]?.name || "Unknown Room")
+            .replace("{room_long}", currentLesson.rooms?.[0]?.longName || "Unknown Room")
+            || "Unknown Activity",
+        type: settings.store.type,
+        timestamps: {
+            start: new Date(currentLesson.startDateTime).getTime(),
+            end: new Date(currentLesson.endDateTime).getTime()
+        },
+        assets: {
+            large_image: await getApplicationAsset("https://play-lh.googleusercontent.com/6lUhld8gFhB0_b-lpce_crw-gdH70lDnXot5ckVmOFMh91jag56whanU-Q30nLt68sr5=w240-h480-rw"),
+            large_text: undefined,
+        }
+    };
+}
+
+
+async function dispatchActivityUpdate() {
+
+    try {
+        FluxDispatcher.dispatch({
+            type: "LOCAL_ACTIVITY_UPDATE",
+            activity: await createActivity(),
+            socketId: "UntisAPI",
+        });
+    } catch (error) {
+        console.error("Error fetching timetable:", error);
+    }
 }
 
 setInterval(dispatchActivityUpdate, 60000);
@@ -564,15 +628,25 @@ export default definePlugin({
 
     stop() {
         removeServerListElement(ServerListRenderPosition.Above, this.renderUntisButton);
+        FluxDispatcher.dispatch({
+            type: "LOCAL_ACTIVITY_UPDATE",
+            activity: null,
+            socketId: "UntisAPI",
+        });
     },
 
     settingsAboutComponent: () => {
+        const activity = useAwaiter(createActivity);
+        const { profileThemeStyle } = useProfileThemeStyle({});
+
         return (
             <>
                 <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
 
                 <Forms.FormText>
-                    <h2 style={{ fontWeight: "bold", fontSize: "18px" }} className={Margins.bottom8}>How to get "Key", "School", "Username" and "Untis Server":</h2>
+                    <h2 style={{ fontWeight: "bold", fontSize: "18px" }} className={Margins.bottom8}>Untis API</h2>
+
+                    <h3 style={{ fontWeight: "bold", fontSize: "16px" }} className={Margins.bottom8}>How to get "Key", "School", "Username" and "Untis Server":</h3>
                     Log in to your Untis account and open your profile at the bottom left. There, switch to "Freigaben" and click on "Anzeigen". You will now see all the data you need.
                     <img src="https://github.com/Leonlp9/Vencord/blob/main/src/plugins/untisApi/Anleitung.png?raw=true" alt="" style={{ width: "100%", marginTop: "8px", borderRadius: "8px" }} />
                 </Forms.FormText>
@@ -580,11 +654,31 @@ export default definePlugin({
                 <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
 
                 <Forms.FormText>
-                    <h2 style={{ fontWeight: "bold", fontSize: "18px" }} className={Margins.bottom8}>How to get "App ID":</h2>
+                    <h2 style={{ fontWeight: "bold", fontSize: "18px" }} className={Margins.bottom16}>Discord RPC</h2>
+
+                    <h3 style={{ fontWeight: "bold", fontSize: "16px" }} className={Margins.bottom8}>How to get "App ID":</h3>
                     Go to <Link href="https://discord.com/developers/applications">Discord Developer Portal</Link> to create an application and get the application ID.
+
+                    <h3 style={{ fontWeight: "bold", fontSize: "16px" }} className={Margins.top20}>Rich Presence Placeholders:</h3>
+                    <p>Use these placeholders in the "Name" and "Description" settings to display dynamic information:</p>
+                    <ul>
+                        <li>{"{lesson}"} - The name of the lesson</li>
+                        <li>{"{lesson_long}"} - The long name of the lesson</li>
+                        <li>{"{room}"} - The name of the room</li>
+                        <li>{"{room_long}"} - The long name of the room</li>
+                    </ul>
                 </Forms.FormText>
 
                 <Forms.FormDivider className={Margins.top8} />
+
+                {activity[0] && (
+                    <div style={{ width: "284px", ...profileThemeStyle, padding: 8, marginTop: 8, borderRadius: 8, background: "var(--bg-mod-faint)" }}>
+                        <ActivityComponent activity={activity[0]} channelId={SelectedChannelStore.getChannelId()}
+                            guild={GuildStore.getGuild(SelectedGuildStore.getLastSelectedGuildId())}
+                            application={{ id: settings.store.AppID || "" }}
+                            user={UserStore.getCurrentUser()} className={"untisActivitySettings"} />
+                    </div>
+                )}
 
             </>
         );

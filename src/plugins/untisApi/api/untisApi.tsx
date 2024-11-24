@@ -35,18 +35,39 @@ class WebUntisAPI {
         this.classID = [];
 
     }
-    public async getCurrentLesson(offset: number = 0) {
+    public async getCurrentLesson() {
         const timetable = await this.getTimetable({});
-        const now = Date.now();
-        const { periods } = timetable;
 
-        const currentIndex = periods.findIndex(
+        // Merge lessons together if end time is equal to start time of next lesson and they have the same subjects, teachers, classes and rooms
+        const mergedPeriods = timetable.periods.reduce((acc, period, index) => {
+            const nextPeriod = timetable.periods[index + 1];
+            if (
+                nextPeriod &&
+                period.endDateTimeUnix === nextPeriod.startDateTimeUnix &&
+                period.subjects?.every((subject, index) => subject.id === nextPeriod.subjects?.[index].id) &&
+                period.teachers?.every((teacher, index) => teacher.id === nextPeriod.teachers?.[index].id) &&
+                period.classes?.every((class_, index) => class_.id === nextPeriod.classes?.[index].id) &&
+                period.rooms?.every((room, index) => room.id === nextPeriod.rooms?.[index].id)
+            ) {
+                return [
+                    ...acc,
+                    {
+                        ...period,
+                        endDateTimeUnix: nextPeriod.endDateTimeUnix,
+                    },
+                ];
+            }
+
+            return [...acc, period];
+        }, [] as periodArray["periods"]);
+
+        const now = Date.now();
+
+        const currentIndex = mergedPeriods.findIndex(
             period => period.startDateTimeUnix! <= now && period.endDateTimeUnix! >= now
         );
 
-
-
-        return periods[currentIndex];
+        return mergedPeriods[currentIndex];
     }
 
 
