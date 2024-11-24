@@ -257,7 +257,15 @@ async function dispatchActivityUpdate() {
     }
 }
 
-setInterval(dispatchActivityUpdate, 60000);
+const scheduleNextUpdate = () => {
+    const now = new Date();
+    const delay = 60000 - (now.getSeconds() * 1000 + now.getMilliseconds());
+    setTimeout(() => {
+        dispatchActivityUpdate();
+        scheduleNextUpdate();
+    }, delay);
+};
+scheduleNextUpdate();
 
 const handleButtonClick = async () => {
 
