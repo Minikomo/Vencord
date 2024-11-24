@@ -678,7 +678,11 @@ export default definePlugin({
                             application={{ id: settings.store.AppID || "" }}
                             user={UserStore.getCurrentUser()} className={"untisActivitySettings"} />
                     </div>
-                )}
+                ) ||
+                    <div style={{ width: "284px", ...profileThemeStyle, padding: 8, marginTop: 8, borderRadius: 8, background: "var(--bg-mod-faint)" }}>
+                        <div style={{ color: "var(--text-normal)" }}>You are not in a lesson right now.</div>
+                    </div>
+                }
 
             </>
         );
