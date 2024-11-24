@@ -551,7 +551,7 @@ function openSingleLessonModal(period: any) {
 
 export default definePlugin({
     name: "UntisAPI",
-    description: "Show your current lesson in Discord",
+    description: "Adds a button to show your timetable from Untis. You can also enable Discord RPC to show your current lesson to others.",
     authors: [Devs.Leonlp9, Devs.minikomo],
     settings,
     dependencies: ["ServerListAPI"],
@@ -574,7 +574,7 @@ export default definePlugin({
                 <Forms.FormText>
                     <h2 style={{ fontWeight: "bold", fontSize: "18px" }} className={Margins.bottom8}>How to get "Key", "School", "Username" and "Untis Server":</h2>
                     Log in to your Untis account and open your profile at the bottom left. There, switch to "Freigaben" and click on "Anzeigen". You will now see all the data you need.
-                    <img src="https://www.fmg-mg.de/wp-content/uploads/2023/01/Untis-logo-750x193.png" alt="" style={{ width: "100%" }} />
+                    <img src="https://github.com/Leonlp9/Vencord/blob/main/src/plugins/untisApi/Anleitung.png?raw=true" alt="" style={{ width: "100%", marginTop: "8px", borderRadius: "8px" }} />
                 </Forms.FormText>
 
                 <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
