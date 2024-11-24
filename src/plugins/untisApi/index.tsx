@@ -215,6 +215,11 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
     const [error, setError] = React.useState<string | null>(null);
     const [timeGrid, setTimeGrid] = React.useState<any>(null);
     const [holidays, setHolidays] = React.useState<any>(null);
+    const [currentDate, setCurrentDate] = React.useState<Date>(() => {
+        const date = new Date();
+        date.setHours(1, 0, 0, 0);
+        return date;
+    });
 
     const untis = new WebUntisAPI(
         settings.store.School || "defaultSchool",
@@ -224,8 +229,6 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         settings.store.UntisType || "STUDENT"
     );
 
-    const [currentWeek, setCurrentWeek] = React.useState<number>(untis.getCurrentCalendarWeek());
-
     React.useEffect(() => {
         const fetchTimetable = async () => {
             try {
@@ -234,10 +237,9 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                 const timegrid = untis.getFullUntisIdData().masterData.timeGrid;
                 setHolidays(untis.getFullUntisIdData().masterData.holidays);
 
-                // Zeitformat anpassen
                 timegrid.days.forEach((day: any) => {
                     day.units.forEach((unit: any) => {
-                        unit.start = unit.startTime.slice(1); // Entfernt "T"
+                        unit.start = unit.startTime.slice(1);
                         unit.end = unit.endTime.slice(1);
                     });
                 });
@@ -253,8 +255,8 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                 const timetableData = await untis.getTimetable({
                     id: 1,
                     type: settings.store.UntisType as "STUDENT" | "CLASS" | "ROOM",
-                    startDate: untis.getMondayOfCalendarWeek(currentWeek, new Date().getFullYear()),
-                    endDate: untis.getFridayOfCalendarWeek(currentWeek, new Date().getFullYear())
+                    startDate: getMonday(currentDate).toISOString().split("T")[0],
+                    endDate: getFriday(currentDate).toISOString().split("T")[0]
                 });
 
                 setTimetable(timetableData.periods);
@@ -269,16 +271,60 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         };
 
         fetchTimetable();
-    }, [currentWeek]);
+    }, [currentDate]);
+
+    // Neuer useEffect-Hook zum Aktualisieren der Feiertage
+    React.useEffect(() => {
+        const fetchHolidays = async () => {
+            try {
+                await untis.setUp();
+                setHolidays(untis.getFullUntisIdData().masterData.holidays);
+            } catch (error) {
+                if (error instanceof Error) {
+                    setError(error.message);
+                    console.error(error);
+                } else {
+                    setError(String(error));
+                }
+            }
+        };
+
+        fetchHolidays();
+    }, [currentDate]);
 
     const handlePreviousWeek = () => {
         setTimetable([]);
-        setCurrentWeek(currentWeek - 1);
+        const newDate = new Date(currentDate);
+        newDate.setDate(newDate.getDate() - 7);
+        newDate.setHours(1, 0, 0, 0);
+        setCurrentDate(newDate);
     };
 
     const handleNextWeek = () => {
         setTimetable([]);
-        setCurrentWeek(currentWeek + 1);
+        const newDate = new Date(currentDate);
+        newDate.setDate(newDate.getDate() + 7);
+        newDate.setHours(1, 0, 0, 0);
+        setCurrentDate(newDate);
+    };
+
+    const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setTimetable([]);
+        const newDate = new Date(event.target.value);
+        newDate.setHours(1, 0, 0, 0);
+        setCurrentDate(newDate);
+    };
+
+    const getMonday = (date: Date) => {
+        const d = new Date(date);
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        return new Date(d.setDate(diff));
+    };
+
+    const getFriday = (date: Date) => {
+        const d = getMonday(date);
+        return new Date(d.setDate(d.getDate() + 4));
     };
 
     if (error) {
@@ -325,7 +371,6 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         }
     }
 
-    // Zeitfenster aus `timeGrid` extrahieren
     const timeSlots = Array.from(
         new Set(
             timeGrid.days.flatMap((day: any) => day.units.map((unit: any) => unit.start))
@@ -340,7 +385,6 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
     }
 
     function getPeriodsAtWeekdayAndTime(weekday: number, time: string) {
-        // startDateTime: "2024-11-20T07:30Z"
         return timetable.filter((period: any) => {
             const startDateTime = new Date(period.startDateTime);
             const isRightWeekday = startDateTime.getDay() === weekday;
@@ -349,18 +393,15 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         });
     }
 
-    function getHolidyByWeekAndWeekdayAndYear(week: number, weekday: number, year: number) {
+    function getHolidayByDateOfWeekWithWeekday(date: Date, weekday: number) {
+        const monday = getMonday(date);
+        const targetDate = new Date(monday);
+        targetDate.setDate(monday.getDate() + weekday - 1);
+
         return holidays.find((holiday: any) => {
             const start = new Date(holiday.startDate);
             const end = new Date(holiday.endDate);
-
-            let startWeek = untis.getMondayOfCalendarWeek(week, year);
-            // add weekdays to startWeek
-            startWeek = new Date(startWeek).toISOString().split("T")[0];
-            startWeek = new Date(new Date(startWeek).setDate(new Date(startWeek).getDate() + weekday)).toISOString().split("T")[0];
-
-            const startWeekDate = new Date(startWeek);
-            return start <= startWeekDate && startWeekDate <= end;
+            return start <= targetDate && targetDate <= end;
         });
     }
 
@@ -373,7 +414,7 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                     <div className="vc-untis-week">
                         <div className="vc-untis-week-button" onClick={handlePreviousWeek}>{"←"}</div>
                         <div className="vc-untis-week-text">
-                            <input type="week" value={`${new Date().getFullYear()}-W${String(currentWeek).padStart(2, "0")}`} onChange={e => setCurrentWeek(parseInt(e.target.value.split("-W")[1]))} className="vc-untis-week-input" id="week" />
+                            <input type="date" value={currentDate.toISOString().split("T")[0]} onChange={handleDateChange} className="vc-untis-week-input" id="date" />
                         </div>
                         <div className="vc-untis-week-button" onClick={handleNextWeek}>{"→"}</div>
                     </div>
@@ -383,8 +424,8 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                             <tr>
                                 <th>Time</th>
                                 {timeGrid.days.map((day: any, index: number) => {
-                                    const date = new Date(untis.getMondayOfCalendarWeek(currentWeek, new Date().getFullYear()));
-                                    date.setDate(date.getDate() + index + 1);
+                                    const date = new Date(getMonday(currentDate));
+                                    date.setDate(date.getDate() + index);
                                     return (
                                         <th key={day.day}>{day.day} {date.getDate().toString().padStart(2, "0")}.{(date.getMonth() + 1).toString().padStart(2, "0")}</th>
                                     );
@@ -427,9 +468,9 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                                 ))}
 
                                             </div>
-                                            {getHolidyByWeekAndWeekdayAndYear(currentWeek, index + 1, new Date().getFullYear()) && (
+                                            {getHolidayByDateOfWeekWithWeekday(currentDate, index + 1) && (
                                                 <div className="vc-untis-holiday">
-                                                    <div>{getHolidyByWeekAndWeekdayAndYear(currentWeek, index + 1, new Date().getFullYear()).longName}</div>
+                                                    <div>{getHolidayByDateOfWeekWithWeekday(currentDate, index + 1).longName}</div>
                                                 </div>
                                             )}
                                         </td>
