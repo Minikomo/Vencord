@@ -8,10 +8,12 @@ import "./style.css";
 
 import { addServerListElement, removeServerListElement, ServerListRenderPosition } from "@api/ServerList";
 import { definePluginSettings } from "@api/Settings";
+import { Link } from "@components/Link";
 import { Devs } from "@utils/constants";
+import { Margins } from "@utils/margins";
 import { ModalProps, ModalRoot, openModal } from "@utils/modal";
 import definePlugin, { OptionType } from "@utils/types";
-import { Button, React } from "@webpack/common";
+import { Button, Forms, React } from "@webpack/common";
 
 import WebUntisAPI from "./api/untisApi";
 
@@ -82,9 +84,10 @@ const settings = definePluginSettings({
     },
     Untisver: {
         type: OptionType.STRING,
-        name: "Untis Version",
-        description: "Your untis version",
+        name: "Untis Server",
+        description: "Your untis server ONLY USE THE SUBDOMAIN",
         defaultValue: "arche",
+        default: "arche"
     },
     UntisType: {
         type: OptionType.SELECT,
@@ -116,6 +119,7 @@ const settings = definePluginSettings({
         name: "Enable Discord RPC",
         description: "Show your current lesson for others on Discord in the Rich Presence",
         defaultValue: true,
+        default: true,
         onChange: onChange
     },
     type: {
@@ -149,50 +153,51 @@ const settings = definePluginSettings({
     Name: {
         type: OptionType.STRING,
         name: "Name",
-        defaultValue: "{lesson} with {teacher}",
+        defaultValue: "{lesson}",
+        default: "{lesson}",
         description: "The name of the activity"
     },
     Description: {
         type: OptionType.STRING,
         name: "Description",
         defaultValue: "In room {room}",
+        default: "In room {room}",
         description: "The description of the activity"
     }
 });
 
-
-
 function onChange() {
+    dispatchActivityUpdate();
 }
 
+
+function dispatchActivityUpdate() {
+    // try {
+    //     FluxDispatcher.dispatch({
+    //         type: "LOCAL_ACTIVITY_UPDATE",
+    //         activity: {
+    //             application_id: "",
+    //             flags: 1,
+    //             name: "Mathe",
+    //             details: "In Raum 123",
+    //             type: 2,
+    //             timestamps: {
+    //                 start: Date.now() - 1000 * 60 * 15,
+    //                 end: Date.now() + 1000 * 60 * 30
+    //             }
+    //         },
+    //         socketId: "CustomRPC",
+    //     });
+    // } catch (error) {
+    //     console.error("Error fetching timetable:", error);
+    // }
+}
+
+setInterval(dispatchActivityUpdate, 60000);
 
 const handleButtonClick = async () => {
 
     openModal(props => <UntisModalContent rootProps={props} />);
-
-    /* try {
-        // Authenticate the WebUntisAPI instance
-        console.log("Fetching timetable...");
-        const currentlessen = await webUntis.getCurrentLesson(1);
-        if (!currentlessen) {
-            console.log("No lesson found");
-        } else {
-            FluxDispatcher.dispatch({
-                type: "LOCAL_ACTIVITY_UPDATE",
-                activity: {
-                    application_id: "",
-                    flags: 1,
-                    name: "Untericht",
-                    details: "Grad in einer stunde",
-                    type: 0,
-                },
-                socketId: "CustomRPC",
-            });
-            // set rpc
-        }
-    } catch (error) {
-        console.error("Error fetching timetable:", error);
-    } */
 };
 
 const UntisButton = () => (
@@ -559,5 +564,29 @@ export default definePlugin({
 
     stop() {
         removeServerListElement(ServerListRenderPosition.Above, this.renderUntisButton);
+    },
+
+    settingsAboutComponent: () => {
+        return (
+            <>
+                <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
+
+                <Forms.FormText>
+                    <h2 style={{ fontWeight: "bold", fontSize: "18px" }} className={Margins.bottom8}>How to get "Key", "School", "Username" and "Untis Server":</h2>
+                    Log in to your Untis account and open your profile at the bottom left. There, switch to "Freigaben" and click on "Anzeigen". You will now see all the data you need.
+                    <img src="https://www.fmg-mg.de/wp-content/uploads/2023/01/Untis-logo-750x193.png" alt="" style={{ width: "100%" }} />
+                </Forms.FormText>
+
+                <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
+
+                <Forms.FormText>
+                    <h2 style={{ fontWeight: "bold", fontSize: "18px" }} className={Margins.bottom8}>How to get "App ID":</h2>
+                    Go to <Link href="https://discord.com/developers/applications">Discord Developer Portal</Link> to create an application and get the application ID.
+                </Forms.FormText>
+
+                <Forms.FormDivider className={Margins.top8} />
+
+            </>
+        );
     }
 });
