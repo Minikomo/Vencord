@@ -387,3 +387,9 @@
 .vc-untis-week-text input::placeholder {
     color: var(--text-secondary);
 }
+
+.untisActivitySettings img {
+    width: 70px;
+    height: 70px;
+    margin-right: 10px;
+}
