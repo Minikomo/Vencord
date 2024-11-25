@@ -1,0 +1,128 @@
+.tetris-board {
+    display: grid;
+    grid-template-rows: repeat(20, 30px);
+    grid-template-columns: repeat(10, 30px);
+    gap: 1px;
+    justify-content: center;
+}
+
+.tetris-cell {
+    background-color: color-mix(in srgb, var(--background-secondary) 90.9%, #ffffff80);
+    border-radius: 1px;
+}
+
+.tetris-cell.filled {
+    background-color: #000;
+}
+
+.tetris-cell.filled.iBlock {
+    background-color: #00f;
+    position: relative;
+}
+
+.tetris-cell.filled.iBlock::before {
+    content: "I";
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.tetris-cell.filled.jBlock {
+    background-color: #0000ff80;
+    position: relative;
+}
+
+.tetris-cell.filled.jBlock::before {
+    content: "J";
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.tetris-cell.filled.lBlock {
+    background-color: #fa0;
+    position: relative;
+}
+
+.tetris-cell.filled.lBlock::before {
+    content: "L";
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.tetris-cell.filled.oBlock {
+    background-color: #ff0;
+    position: relative;
+}
+
+.tetris-cell.filled.oBlock::before {
+    content: "O";
+    color: #000;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.tetris-cell.filled.sBlock {
+    background-color: #0f0;
+    position: relative;
+}
+
+.tetris-cell.filled.sBlock::before {
+    content: "S";
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.tetris-cell.filled.tBlock {
+    background-color: #a0f;
+    position: relative;
+}
+
+.tetris-cell.filled.tBlock::before {
+    content: "T";
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.tetris-cell.filled.zBlock {
+    background-color: #f00;
+    position: relative;
+}
+
+.tetris-cell.filled.zBlock::before {
+    content: "Z";
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

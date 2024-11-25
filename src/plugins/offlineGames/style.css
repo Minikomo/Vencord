@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Press+Start+2P&display=swap');
+
+.game-select-root{
+    width: 75vw;
+    max-width: 800px;
+}
+
+.game-select-root > div > h2{
+    text-align: center;
+    margin-top: 20px;
+    color: var(--text-normal);
+    width: 100%;
+    font-size: 1.5em;
+    font-weight: 500;
+    margin-bottom: 10px;
+    font-family: "Press Start 2P", system-ui;
+}
+
+.game-select{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.game-select .game{
+    margin: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: var(--text-normal);
+    background: var(--background-secondary);
+    box-shadow: 0 0 5px #0000001a;
+    width: 150px;
+}
+
+.game-select .game:hover{
+    background-color: color-mix(in srgb, var(--background-secondary) 90.9%, #ffffff80) !important;
+}
+
+.game-select > .game > img{
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+    display: block;
+    image-rendering: pixelated;
+}
+
+.game-select > .game > h3{
+    text-align: center;
+    margin-top: 10px;
+}
+
+.game-select > .game > p{
+    text-align: center;
+    margin-top: 5px;
+}
