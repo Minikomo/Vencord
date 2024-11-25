@@ -5,11 +5,11 @@
  */
 
 import { addChatBarButton, ChatBarButton, removeChatBarButton } from "@api/ChatButtons";
-import { addPreSendListener, removePreSendListener, SendListener } from "@api/MessageEvents";
+import { addPreSendListener, removePreSendListener } from "@api/MessageEvents";
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
-import { React, useEffect, useState } from "@webpack/common";
+import { React, useState } from "@webpack/common";
 
 const PHRASES = [
     "UwU",
@@ -139,10 +139,12 @@ const settings = definePluginSettings({
     persistState: {
         type: OptionType.BOOLEAN,
         description: "Whether to persist the state of the UwUfy toggle when changing channels",
-        default: false,
-        onChange(newValue: boolean) {
-            if (newValue === false) lastState = false;
-        }
+        default: false
+    },
+    enableUwUfy: {
+        type: OptionType.BOOLEAN,
+        description: "Enable UwUfy",
+        default: true
     },
     CustomPhrases: {
         type: OptionType.STRING,
@@ -183,33 +185,19 @@ const settings = definePluginSettings({
     }
 });
 
-let lastState = false;
-
 const UwUfyToggle: ChatBarButton = ({ isMainChat }) => {
-    const [enabled, setEnabled] = useState(lastState);
+    const [enabled, setEnabled] = useState(settings.store.enableUwUfy);
     const [enabledNSFW, setEnabledNSFW] = useState(settings.store.FreakyModeNSFW);
 
     function setEnabledValue(value: boolean) {
-        if (settings.store.persistState) lastState = value;
+        settings.store.enableUwUfy = value;
         setEnabled(value);
     }
 
     function setNSFWValue(value: boolean) {
-        if (settings.store.persistState) lastState = value;
         settings.store.FreakyModeNSFW = value;
         setEnabledNSFW(value);
     }
-
-    useEffect(() => {
-        const listener: SendListener = (_, message) => {
-            if (enabled) {
-                message.content = uwufyString(message.content);
-            }
-        };
-
-        addPreSendListener(listener);
-        return () => void removePreSendListener(listener);
-    }, [enabled]);
 
     if (!isMainChat) return null;
 
@@ -261,9 +249,14 @@ export default definePlugin({
 
     start() {
         addChatBarButton("UwUfyToggle", UwUfyToggle);
+        this.uwuPreSend = addPreSendListener((_, message) => {
+            if (!settings.store.enableUwUfy) return;
+            message.content = uwufyString(message.content);
+        });
     },
 
     stop() {
         removeChatBarButton("UwUfyToggle");
+        removePreSendListener(this.uwuPreSend);
     }
 });
