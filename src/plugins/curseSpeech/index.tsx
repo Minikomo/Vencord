@@ -5,20 +5,17 @@
  */
 
 import { addChatBarButton, ChatBarButton, removeChatBarButton } from "@api/ChatButtons";
-import { addPreSendListener, removePreSendListener, SendListener } from "@api/MessageEvents";
+import { addPreSendListener, removePreSendListener } from "@api/MessageEvents";
 import { definePluginSettings } from "@api/Settings";
 import { Devs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
-import { React, useEffect, useState } from "@webpack/common";
+import { React, useState } from "@webpack/common";
 
-let enable = false;
+const enable = false;
 
 function getCursedstring(input: string): string {
     let tempstring = "";
     for (let i = 0; i < input.length; i++) {
-        console.log(input[i]);
-        console.log(input.length);
-        console.log(i);
         if (i === 0) {
             tempstring += input[i];
 
@@ -129,11 +126,6 @@ function onCurseIcon() {
 
 }
 
-
-
-
-
-
 function cursefyString(input: string): string {
     var temp = input.split(" ");
     var newwords = "";
@@ -146,73 +138,38 @@ function cursefyString(input: string): string {
         }
     });
     return newwords;
-
-
-
-
-
-
-    return newwords;
 }
 
 const settings = definePluginSettings({
-
-
     cencorletter: {
         type: OptionType.STRING,
         description: "Custom cencor letter",
         default: "*",
-
     },
-
-
-
-
+    enabled: {
+        type: OptionType.BOOLEAN,
+        description: "Enable the plugin",
+        default: false,
+    },
 });
 
-const lastState = false;
-
 const curseSpeech: ChatBarButton = ({ isMainChat }) => {
-    const [enabled, setEnabled] = useState(lastState);
-
+    const [enabled, setEnabled] = useState(settings.store.enabled);
 
     function setEnabledValue() {
-
-        if (enable) {
-            enable = false;
-
-
-        }
-        else {
-            enable = true;
-
-        }
+        settings.store.enabled = !enabled;
+        setEnabled(!enabled);
     }
-
-
-    useEffect(() => {
-        const listener: SendListener = (_, message) => {
-            console.log(message.content);
-            message.content = cursefyString(message.content);
-
-            console.log(cursefyString(message.content));
-
-
-        };
-
-        addPreSendListener(listener);
-        return () => void removePreSendListener(listener);
-    }, [enabled]);
 
     if (!isMainChat) return null;
 
     return (
         <ChatBarButton
-            tooltip={enabled ? "Disable " : "Enable "}
+            tooltip={enabled ? "Disable cursed speech" : "Enable cursed speech"}
             onClick={() => setEnabledValue()}
 
         >
-            {onCurseIcon()}
+            {enabled ? onCurseIcon() : onCurseIconOFF()}
         </ChatBarButton>
     );
 };
@@ -226,9 +183,15 @@ export default definePlugin({
 
     start() {
         addChatBarButton("curseSpeech", curseSpeech);
+        this.cursePreSend = addPreSendListener((_, message) => {
+            if (!settings.store.enabled) return;
+            message.content = cursefyString(message.content
+            );
+        });
     },
 
     stop() {
         removeChatBarButton("curseSpeech");
+        removePreSendListener(this.cursePreSend);
     }
 });
