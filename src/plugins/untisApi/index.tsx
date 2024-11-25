@@ -8,13 +8,26 @@ import "./style.css";
 
 import { addServerListElement, removeServerListElement, ServerListRenderPosition } from "@api/ServerList";
 import { definePluginSettings } from "@api/Settings";
+import { getUserSettingLazy } from "@api/UserSettings";
+import { Link } from "@components/Link";
 import { Devs } from "@utils/constants";
+import { Margins } from "@utils/margins";
 import { ModalProps, ModalRoot, openModal } from "@utils/modal";
+import { useAwaiter } from "@utils/react";
 import definePlugin, { OptionType } from "@utils/types";
-import { Button, React } from "@webpack/common";
+import { findByCodeLazy, findComponentByCodeLazy } from "@webpack";
+import { ApplicationAssetUtils, Button, FluxDispatcher, Forms, GuildStore, React, SelectedChannelStore, SelectedGuildStore, UserStore } from "@webpack/common";
 
 import WebUntisAPI from "./api/untisApi";
 
+const useProfileThemeStyle = findByCodeLazy("profileThemeStyle:", "--profile-gradient-primary-color");
+const ActivityComponent = findComponentByCodeLazy("onOpenGameProfile");
+const ShowCurrentGame = getUserSettingLazy<boolean>("status", "showCurrentGame")!;
+
+async function getApplicationAsset(key: string): Promise<string> {
+    if (/https?:\/\/(cdn|media)\.discordapp\.(com|net)\/attachments\//.test(key)) return "mp:" + key.replace(/https?:\/\/(cdn|media)\.discordapp\.(com|net)\//, "");
+    return (await ApplicationAssetUtils.fetchAssetIds(settings.store.AppID!, [key]))[0];
+}
 
 
 interface ActivityAssets {
@@ -82,9 +95,10 @@ const settings = definePluginSettings({
     },
     Untisver: {
         type: OptionType.STRING,
-        name: "Untis Version",
-        description: "Your untis version",
+        name: "Untis Server",
+        description: "Your untis server ONLY USE THE SUBDOMAIN",
         defaultValue: "arche",
+        default: "arche"
     },
     UntisType: {
         type: OptionType.SELECT,
@@ -109,13 +123,15 @@ const settings = definePluginSettings({
         type: OptionType.STRING,
         name: "App ID",
         description: "Your Discord Bot application ID (required for Discord RPC)",
-        defaultValue: ""
+        defaultValue: "",
+        onChange: onChange
     },
     EnableDiscordRPC: {
         type: OptionType.BOOLEAN,
         name: "Enable Discord RPC",
         description: "Show your current lesson for others on Discord in the Rich Presence",
         defaultValue: true,
+        default: true,
         onChange: onChange
     },
     type: {
@@ -125,8 +141,7 @@ const settings = definePluginSettings({
         options: [
             {
                 label: "Playing",
-                value: ActivityType.PLAYING,
-                default: true
+                value: ActivityType.PLAYING
             },
             {
                 label: "Streaming",
@@ -134,7 +149,8 @@ const settings = definePluginSettings({
             },
             {
                 label: "Listening",
-                value: ActivityType.LISTENING
+                value: ActivityType.LISTENING,
+                default: true
             },
             {
                 label: "Watching",
@@ -149,50 +165,111 @@ const settings = definePluginSettings({
     Name: {
         type: OptionType.STRING,
         name: "Name",
-        defaultValue: "{lesson} with {teacher}",
-        description: "The name of the activity"
+        defaultValue: "{lesson}",
+        default: "{lesson}",
+        description: "The name of the activity (supports placeholders)",
+        onChange: onChange
     },
     Description: {
         type: OptionType.STRING,
         name: "Description",
         defaultValue: "In room {room}",
-        description: "The description of the activity"
+        default: "{room}",
+        description: "The description of the activity (supports placeholders)",
+        onChange: onChange
     }
 });
 
-
-
 function onChange() {
+    dispatchActivityUpdate();
 }
 
+async function createActivity(): Promise<Activity | undefined> {
+    if (!settings.store.EnableDiscordRPC) {
+        return undefined;
+    }
+
+    if (!settings.store.AppID) {
+        return undefined;
+    }
+
+    if (!settings.store.Name) {
+        return undefined;
+    }
+
+    const untis = new WebUntisAPI(
+        settings.store.School || "defaultSchool",
+        settings.store.UntisUsername || "defaultUsername",
+        settings.store.Key || "defaultKey",
+        settings.store.Untisver || "arche",
+        settings.store.UntisType || "STUDENT"
+    );
+
+    try {
+        await untis.setUp();
+    } catch (error) {
+        console.error("Error setting up Untis:", error);
+        return undefined;
+    }
+
+    const currentLesson = await untis.getCurrentLesson();
+
+    if (!currentLesson) {
+        return undefined;
+    }
+
+    return {
+        application_id: settings.store.AppID || "",
+        flags: 1,
+        name: settings.store.Name?.replace("{lesson}", currentLesson.subjects?.[0]?.name || "Unknown Lesson")
+            .replace("{lesson_long}", currentLesson.subjects?.[0]?.longName || "Unknown Lesson")
+            .replace("{room}", currentLesson.rooms?.[0]?.name || "Unknown Room")
+            .replace("{room_long}", currentLesson.rooms?.[0]?.longName || "Unknown Room")
+            || "Unknown Activity",
+        details: settings.store.Description?.replace("{lesson}", currentLesson.subjects?.[0]?.name || "Unknown Lesson")
+            .replace("{lesson_long}", currentLesson.subjects?.[0]?.longName || "Unknown Lesson")
+            .replace("{room}", currentLesson.rooms?.[0]?.name || "Unknown Room")
+            .replace("{room_long}", currentLesson.rooms?.[0]?.longName || "Unknown Room")
+            || "Unknown Activity",
+        type: settings.store.type,
+        timestamps: {
+            start: new Date(currentLesson.startDateTime).getTime(),
+            end: new Date(currentLesson.endDateTime).getTime()
+        },
+        assets: {
+            large_image: await getApplicationAsset("https://play-lh.googleusercontent.com/6lUhld8gFhB0_b-lpce_crw-gdH70lDnXot5ckVmOFMh91jag56whanU-Q30nLt68sr5=w240-h480-rw"),
+            large_text: undefined,
+        }
+    };
+}
+
+
+async function dispatchActivityUpdate() {
+
+    try {
+        FluxDispatcher.dispatch({
+            type: "LOCAL_ACTIVITY_UPDATE",
+            activity: await createActivity(),
+            socketId: "UntisAPI",
+        });
+    } catch (error) {
+        console.error("Error fetching timetable:", error);
+    }
+}
+
+const scheduleNextUpdate = () => {
+    const now = new Date();
+    const delay = 60000 - (now.getSeconds() * 1000 + now.getMilliseconds());
+    setTimeout(() => {
+        dispatchActivityUpdate();
+        scheduleNextUpdate();
+    }, delay);
+};
+scheduleNextUpdate();
 
 const handleButtonClick = async () => {
 
     openModal(props => <UntisModalContent rootProps={props} />);
-
-    /* try {
-        // Authenticate the WebUntisAPI instance
-        console.log("Fetching timetable...");
-        const currentlessen = await webUntis.getCurrentLesson(1);
-        if (!currentlessen) {
-            console.log("No lesson found");
-        } else {
-            FluxDispatcher.dispatch({
-                type: "LOCAL_ACTIVITY_UPDATE",
-                activity: {
-                    application_id: "",
-                    flags: 1,
-                    name: "Untericht",
-                    details: "Grad in einer stunde",
-                    type: 0,
-                },
-                socketId: "CustomRPC",
-            });
-            // set rpc
-        }
-    } catch (error) {
-        console.error("Error fetching timetable:", error);
-    } */
 };
 
 const UntisButton = () => (
@@ -214,6 +291,13 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
     const [timetable, setTimetable] = React.useState<any[]>([]);
     const [error, setError] = React.useState<string | null>(null);
     const [timeGrid, setTimeGrid] = React.useState<any>(null);
+    const [holidays, setHolidays] = React.useState<any>(null);
+    const [currentDate, setCurrentDate] = React.useState<Date>(() => {
+        const date = new Date();
+        date.setHours(1, 0, 0, 0);
+        return date;
+    });
+
     const untis = new WebUntisAPI(
         settings.store.School || "defaultSchool",
         settings.store.UntisUsername || "defaultUsername",
@@ -222,26 +306,17 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         settings.store.UntisType || "STUDENT"
     );
 
-    const [currentWeek, setCurrentWeek] = React.useState<number>(untis.getCurrentCalendarWeek());
-
     React.useEffect(() => {
         const fetchTimetable = async () => {
             try {
-                const untis = new WebUntisAPI(
-                    settings.store.School || "defaultSchool",
-                    settings.store.UntisUsername || "defaultUsername",
-                    settings.store.Key || "defaultKey",
-                    settings.store.Untisver || "arche",
-                    settings.store.UntisType || "STUDENT"
-                );
                 await untis.setUp();
 
                 const timegrid = untis.getFullUntisIdData().masterData.timeGrid;
+                setHolidays(untis.getFullUntisIdData().masterData.holidays);
 
-                // Zeitformat anpassen
                 timegrid.days.forEach((day: any) => {
                     day.units.forEach((unit: any) => {
-                        unit.start = unit.startTime.slice(1); // Entfernt "T"
+                        unit.start = unit.startTime.slice(1);
                         unit.end = unit.endTime.slice(1);
                     });
                 });
@@ -257,8 +332,8 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                 const timetableData = await untis.getTimetable({
                     id: 1,
                     type: settings.store.UntisType as "STUDENT" | "CLASS" | "ROOM",
-                    startDate: untis.getMondayOfCalendarWeek(currentWeek, new Date().getFullYear()),
-                    endDate: untis.getFridayOfCalendarWeek(currentWeek, new Date().getFullYear())
+                    startDate: getMonday(currentDate).toISOString().split("T")[0],
+                    endDate: getFriday(currentDate).toISOString().split("T")[0]
                 });
 
                 setTimetable(timetableData.periods);
@@ -273,16 +348,60 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         };
 
         fetchTimetable();
-    }, [currentWeek]);
+    }, [currentDate]);
+
+    // Neuer useEffect-Hook zum Aktualisieren der Feiertage
+    React.useEffect(() => {
+        const fetchHolidays = async () => {
+            try {
+                await untis.setUp();
+                setHolidays(untis.getFullUntisIdData().masterData.holidays);
+            } catch (error) {
+                if (error instanceof Error) {
+                    setError(error.message);
+                    console.error(error);
+                } else {
+                    setError(String(error));
+                }
+            }
+        };
+
+        fetchHolidays();
+    }, [currentDate]);
 
     const handlePreviousWeek = () => {
         setTimetable([]);
-        setCurrentWeek(currentWeek - 1);
+        const newDate = new Date(currentDate);
+        newDate.setDate(newDate.getDate() - 7);
+        newDate.setHours(1, 0, 0, 0);
+        setCurrentDate(newDate);
     };
 
     const handleNextWeek = () => {
         setTimetable([]);
-        setCurrentWeek(currentWeek + 1);
+        const newDate = new Date(currentDate);
+        newDate.setDate(newDate.getDate() + 7);
+        newDate.setHours(1, 0, 0, 0);
+        setCurrentDate(newDate);
+    };
+
+    const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setTimetable([]);
+        const newDate = new Date(event.target.value);
+        newDate.setHours(1, 0, 0, 0);
+        setCurrentDate(newDate);
+    };
+
+    const getMonday = (date: Date) => {
+        const d = new Date(date);
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        return new Date(d.setDate(diff));
+    };
+
+    const getFriday = (date: Date) => {
+        const d = getMonday(date);
+        return new Date(d.setDate(d.getDate() + 4));
     };
 
     if (error) {
@@ -329,7 +448,6 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
         }
     }
 
-    // Zeitfenster aus `timeGrid` extrahieren
     const timeSlots = Array.from(
         new Set(
             timeGrid.days.flatMap((day: any) => day.units.map((unit: any) => unit.start))
@@ -344,12 +462,23 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
     }
 
     function getPeriodsAtWeekdayAndTime(weekday: number, time: string) {
-        // startDateTime: "2024-11-20T07:30Z"
         return timetable.filter((period: any) => {
             const startDateTime = new Date(period.startDateTime);
             const isRightWeekday = startDateTime.getDay() === weekday;
             const isBetweenStartAndEnd = period.startDateTime.split("T")[1].slice(0, 5) <= time && time < period.endDateTime.split("T")[1].slice(0, 5);
             return isRightWeekday && isBetweenStartAndEnd;
+        });
+    }
+
+    function getHolidayByDateOfWeekWithWeekday(date: Date, weekday: number) {
+        const monday = getMonday(date);
+        const targetDate = new Date(monday);
+        targetDate.setDate(monday.getDate() + weekday - 1);
+
+        return holidays.find((holiday: any) => {
+            const start = new Date(holiday.startDate);
+            const end = new Date(holiday.endDate);
+            return start <= targetDate && targetDate <= end;
         });
     }
 
@@ -361,7 +490,9 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                     {/* change weeks */}
                     <div className="vc-untis-week">
                         <div className="vc-untis-week-button" onClick={handlePreviousWeek}>{"←"}</div>
-                        <div className="vc-untis-week-text">KW {currentWeek} ({untis.getMondayOfCalendarWeek(currentWeek, new Date().getFullYear())} - {untis.getFridayOfCalendarWeek(currentWeek, new Date().getFullYear())})</div>
+                        <div className="vc-untis-week-text">
+                            <input type="date" value={currentDate.toISOString().split("T")[0]} onChange={handleDateChange} className="vc-untis-week-input" id="date" />
+                        </div>
                         <div className="vc-untis-week-button" onClick={handleNextWeek}>{"→"}</div>
                     </div>
 
@@ -369,9 +500,13 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                         <thead>
                             <tr>
                                 <th>Time</th>
-                                {timeGrid.days.map((day: any) => (
-                                    <th key={day.day}>{day.day}</th>
-                                ))}
+                                {timeGrid.days.map((day: any, index: number) => {
+                                    const date = new Date(getMonday(currentDate));
+                                    date.setDate(date.getDate() + index);
+                                    return (
+                                        <th key={day.day}>{day.day} {date.getDate().toString().padStart(2, "0")}.{(date.getMonth() + 1).toString().padStart(2, "0")}</th>
+                                    );
+                                })}
                             </tr>
                         </thead>
                         <tbody>
@@ -381,33 +516,40 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                                         <div>{`${String(timeSlot)} - ${timeGrid.days[0].units.find((unit: any) => unit.start === timeSlot)?.end || ""}`}</div>
                                     </td>
                                     {timeGrid.days.map((day: any, index: number) => (
-                                        <td key={index + 1}>
+                                        <td key={index + 1} className={`${new Date() > new Date(`${currentDate.toISOString().split("T")[0]}T${timeSlot}`) ? "PAST" : ""} ${new Date() >= new Date(`${currentDate.toISOString().split("T")[0]}T${timeSlot}`) && new Date() < new Date(`${currentDate.toISOString().split("T")[0]}T${timeGrid.days[0].units.find((unit: any) => unit.start === timeSlot)?.end}`) ? "CURRENT" : ""}`}>
                                             <div className="vc-untis-periods">
                                                 {getPeriodsAtWeekdayAndTime(index + 1, timeSlot).map((period: any) => (
-                                                    <div key={period.id} style={{ color: period.subjects[0].backColor }} className={`vc-untis-period ${period.is[0]} ${period.homeWorks.filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0]).length > 0 ? "HOMEWORK" : ""}`} onClick={() => openSingleLessonModal(period)}>
+                                                    <div key={period.id} style={{ color: period.subjects?.[0]?.backColor || "#f1f1f1" }} className={`vc-untis-period ${period.is[0]} ${period.homeWorks.filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0]).length > 0 ? "HOMEWORK" : ""} ${period.exam ? "EXAM" : ""}`
+                                                    } onClick={() => openSingleLessonModal(period)}>
                                                         <div>
-                                                            {period.subjects.map((subject: any) => (
+                                                            {period.subjects?.map((subject: any) => (
                                                                 <div key={subject.id} title={subject.longName}>{subject.name}</div>
                                                             ))}
                                                         </div>
                                                         <div>
-                                                            {period.teachers.map((teacher: any) => (
+                                                            {period.teachers?.map((teacher: any) => (
                                                                 <div key={teacher.id} title={teacher.longName}>{teacher.name}</div>
                                                             ))}
                                                         </div>
                                                         <div>
-                                                            {period.rooms.map((room: any) => (
+                                                            {period.rooms?.map((room: any) => (
                                                                 <div key={room.id} title={room.longName}>{room.name}</div>
                                                             ))}
                                                         </div>
                                                         <div>
-                                                            {period.classes.map((class_: any) => (
+                                                            {period.classes?.map((class_: any) => (
                                                                 <div key={class_.id} title={class_.longName}>{class_.name}</div>
                                                             ))}
                                                         </div>
                                                     </div>
                                                 ))}
+
                                             </div>
+                                            {getHolidayByDateOfWeekWithWeekday(currentDate, index + 1) && (
+                                                <div className="vc-untis-holiday">
+                                                    <div>{getHolidayByDateOfWeekWithWeekday(currentDate, index + 1).longName}</div>
+                                                </div>
+                                            )}
                                         </td>
                                     ))}
                                 </tr>
@@ -422,13 +564,38 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
 
 
 const SingleLessonModalContent = ({ rootProps, period }: { rootProps: ModalProps; period: any; }) => {
+
     return (
         <ModalRoot {...rootProps}>
             <div className="vc-untis-single-lesson">
                 <h2>{period.subjects[0].name} ({period.subjects[0].longName})</h2>
-                <p>Teacher: {period.teachers[0].name} ({period.teachers[0].longName})</p>
-                <p>Room: {period.rooms[0].name} ({period.rooms[0].longName})</p>
-                <p>Class: {period.classes[0].name} ({period.classes[0].longName})</p>
+                <p><b>Teacher:</b> {period.teachers.map((teacher: any) => `${teacher.name} (${teacher.longName})`).join(", ")}</p>
+                <p><b>Room:</b> {period.rooms.map((room: any) => `${room.name} (${room.longName})`).join(", ")}</p>
+                <p><b>Class:</b> {period.classes.map((class_: any) => (
+                    <span key={class_.id} title={class_.longName}>{class_.name}</span>
+                )).reduce((prev, curr) => [prev, ", ", curr])}</p>
+                <p><b>Is:</b> {period.is[0]}</p>
+
+                {period.text.lesson && (
+                    <div className="vc-untis-single-lesson-text">
+                        <h3>Lesson</h3>
+                        <p>{period.text.lesson}</p>
+                    </div>
+                )}
+
+                {period.text.substitution && (
+                    <div className="vc-untis-single-lesson-text">
+                        <h3>Substitution</h3>
+                        <p>{period.text.substitution}</p>
+                    </div>
+                )}
+
+                {period.text.info && (
+                    <div className="vc-untis-single-lesson-text">
+                        <h3>Info</h3>
+                        <p>{period.text.info}</p>
+                    </div>
+                )}
 
                 {period.homeWorks
                     .filter((homework: any) => homework.endDate === period.startDateTime.split("T")[0])
@@ -456,7 +623,7 @@ function openSingleLessonModal(period: any) {
 
 export default definePlugin({
     name: "UntisAPI",
-    description: "Show your current lesson in Discord",
+    description: "Adds a button to show your timetable from Untis. You can also enable Discord RPC to show your current lesson to others.",
     authors: [Devs.Leonlp9, Devs.minikomo],
     settings,
     dependencies: ["ServerListAPI"],
@@ -469,5 +636,63 @@ export default definePlugin({
 
     stop() {
         removeServerListElement(ServerListRenderPosition.Above, this.renderUntisButton);
+        FluxDispatcher.dispatch({
+            type: "LOCAL_ACTIVITY_UPDATE",
+            activity: null,
+            socketId: "UntisAPI",
+        });
+    },
+
+    settingsAboutComponent: () => {
+        const activity = useAwaiter(createActivity);
+        const { profileThemeStyle } = useProfileThemeStyle({});
+
+        return (
+            <>
+                <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
+
+                <Forms.FormText>
+                    <h2 style={{ fontWeight: "bold", fontSize: "18px" }} className={Margins.bottom8}>Untis API</h2>
+
+                    <h3 style={{ fontWeight: "bold", fontSize: "16px" }} className={Margins.bottom8}>How to get "Key", "School", "Username" and "Untis Server":</h3>
+                    Log in to your Untis account and open your profile at the bottom left. There, switch to "Freigaben" and click on "Anzeigen". You will now see all the data you need.
+                    <img src="https://github.com/Leonlp9/Vencord/blob/main/src/plugins/untisApi/Anleitung.png?raw=true" alt="" style={{ width: "100%", marginTop: "8px", borderRadius: "8px" }} />
+                </Forms.FormText>
+
+                <Forms.FormDivider className={Margins.top8 + " " + Margins.bottom8} />
+
+                <Forms.FormText>
+                    <h2 style={{ fontWeight: "bold", fontSize: "18px" }} className={Margins.bottom16}>Discord RPC</h2>
+
+                    <h3 style={{ fontWeight: "bold", fontSize: "16px" }} className={Margins.bottom8}>How to get "App ID":</h3>
+                    Go to <Link href="https://discord.com/developers/applications">Discord Developer Portal</Link> to create an application and get the application ID.
+
+                    <h3 style={{ fontWeight: "bold", fontSize: "16px" }} className={Margins.top20}>Rich Presence Placeholders:</h3>
+                    <p>Use these placeholders in the "Name" and "Description" settings to display dynamic information:</p>
+                    <ul>
+                        <li>{"{lesson}"} - The name of the lesson</li>
+                        <li>{"{lesson_long}"} - The long name of the lesson</li>
+                        <li>{"{room}"} - The name of the room</li>
+                        <li>{"{room_long}"} - The long name of the room</li>
+                    </ul>
+                </Forms.FormText>
+
+                <Forms.FormDivider className={Margins.top8} />
+
+                {activity[0] && (
+                    <div style={{ width: "284px", ...profileThemeStyle, padding: 8, marginTop: 8, borderRadius: 8, background: "var(--bg-mod-faint)" }}>
+                        <ActivityComponent activity={activity[0]} channelId={SelectedChannelStore.getChannelId()}
+                            guild={GuildStore.getGuild(SelectedGuildStore.getLastSelectedGuildId())}
+                            application={{ id: settings.store.AppID || "" }}
+                            user={UserStore.getCurrentUser()} className={"untisActivitySettings"} />
+                    </div>
+                ) ||
+                    <div style={{ width: "284px", ...profileThemeStyle, padding: 8, marginTop: 8, borderRadius: 8, background: "var(--bg-mod-faint)" }}>
+                        <div style={{ color: "var(--text-normal)" }}>You are not in a lesson right now.</div>
+                    </div>
+                }
+
+            </>
+        );
     }
 });
