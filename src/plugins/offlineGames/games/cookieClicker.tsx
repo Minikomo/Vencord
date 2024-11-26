@@ -15,19 +15,71 @@ import { defineOfflineGame } from "../index";
 const cookieClickerStoreKey = "Vencord.offlineGames.cookieClicker";
 
 const shopElements = [
-    { id: 0, name: "Discord User", cost: 15, cps: 0.1, costIncrease: 1.15, img: "https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png" },
-    { id: 1, name: "Server Owner", cost: 100, cps: 1, costIncrease: 1.18, img: "https://cdn3.emoji.gg/emojis/owner.png" },
-    { id: 2, name: "Nitro Classic", cost: 500, cps: 5, costIncrease: 1.2, img: "https://img.icons8.com/fluent/600/discord-nitro-badge.png" },
-    { id: 3, name: "Nitro", cost: 2000, cps: 20, costIncrease: 1.25, img: "https://cdn.iconscout.com/icon/free/png-256/free-discord-nitro-logo-icon-download-in-svg-png-gif-file-formats--voice-premium-social-media-pack-logos-icons-5575180.png" },
-    { id: 4, name: "Server Boost", cost: 7000, cps: 70, costIncrease: 1.3, img: "https://cdn.iconscout.com/icon/free/png-256/free-level-discord-boost-logo-icon-download-in-svg-png-gif-file-formats--social-media-pack-logos-icons-5575059.png" },
-    { id: 5, name: "HypeSquad", cost: 50000, cps: 500, costIncrease: 1.35, img: "https://img.icons8.com/?size=512&id=h6eKoXSRNFgA&format=png" },
-    { id: 6, name: "Partner Program", cost: 1000000, cps: 10000, costIncrease: 1.4, img: "https://upload.wikimedia.org/wikipedia/commons/5/52/Discord_Partnership_Badge.svg" },
-    { id: 7, name: "Verified Server", cost: 100000000, cps: 1000000, costIncrease: 1.5, img: "https://cdn3.emoji.gg/emojis/3460-verified.png" },
-    { id: 8, name: "Discord Employee", cost: 10000000000, cps: 100000000, costIncrease: 1.6, img: "https://img.icons8.com/fluent/600/discord-stuff-badge.png" },
-    { id: 9, name: "Discord Developer", cost: 100000000000, cps: 1000000000, costIncrease: 1.7, img: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Discord_Active_Developer_Badge.svg" },
-    { id: 10, name: "Discord Admin", cost: 1000000000000, cps: 10000000000, costIncrease: 1.8, img: "https://cdn-icons-png.flaticon.com/512/2206/2206368.png" },
-    { id: 11, name: "Discord CEO", cost: 10000000000000, cps: 100000000000, costIncrease: 1.9, img: "https://cdn-icons-png.flaticon.com/512/4961/4961733.png" },
-    { id: 12, name: "Discord Hacker", cost: 100000000000000, cps: 1000000000000, costIncrease: 2, img: "https://img.icons8.com/fluent/600/hacker.png" },
+    {
+        id: 0, name: "Discord User", cost: 15, cps: 0.1, secondCost: 18,
+        formula: (a: number, b: number, i: number) => b + (b - a) + 1,
+        img: "https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png"
+    },
+    {
+        id: 1, name: "Server Owner", cost: 100, cps: 1, secondCost: 115,
+        formula: (a: number, b: number, i: number) => b + (b - a) + 2 * (i - 1),
+        img: "https://cdn3.emoji.gg/emojis/owner.png"
+    },
+    {
+        id: 2, name: "Nitro Classic", cost: 1100, cps: 8, secondCost: 1265,
+        formula: (a: number, b: number, i: number) => b + (b - a) + 3 * (i - 1),
+        img: "https://img.icons8.com/fluent/600/discord-nitro-badge.png"
+    },
+    {
+        id: 3, name: "Nitro", cost: 12000, cps: 47, secondCost: 13800,
+        formula: (a: number, b: number, i: number) => b + (b - a) + 4 * (i - 1),
+        img: "https://cdn.iconscout.com/icon/free/png-256/free-discord-nitro-logo-icon-download-in-svg-png-gif-file-formats--voice-premium-social-media-pack-logos-icons-5575180.png"
+    },
+    {
+        id: 4, name: "Server Boost", cost: 130000, cps: 260, secondCost: 149500,
+        formula: (a: number, b: number, i: number) => b + (b - a) + 5 * (i - 1),
+        img: "https://cdn.iconscout.com/icon/free/png-256/free-level-discord-boost-logo-icon-download-in-svg-png-gif-file-formats--social-media-pack-logos-icons-5575059.png"
+    },
+    {
+        id: 5, name: "HypeSquad", cost: 1400000, cps: 1400, secondCost: 1610000,
+        formula: (a: number, b: number, i: number) => b + (b - a) + 6 * (i - 1),
+        img: "https://img.icons8.com/?size=512&id=h6eKoXSRNFgA&format=png"
+    },
+    {
+        id: 6, name: "Partner Program", cost: 20000000, cps: 7800, secondCost: 23000000,
+        formula: (a: number, b: number, i: number) => b + (b - a) + 7 * (i - 1),
+        img: "https://upload.wikimedia.org/wikipedia/commons/5/52/Discord_Partnership_Badge.svg"
+    },
+    {
+        id: 7, name: "Verified Server", cost: 330000000, cps: 44000, secondCost: 380000000,
+        formula: (a: number, b: number, i: number) => b + (b - a) + 8 * (i - 1),
+        img: "https://cdn3.emoji.gg/emojis/3460-verified.png"
+    },
+    {
+        id: 8, name: "Discord Employee", cost: 5100000000, cps: 260000, secondCost: 5900000000,
+        formula: (a: number, b: number, i: number) => b + (b - a) + 9 * (i - 1),
+        img: "https://img.icons8.com/fluent/600/discord-stuff-badge.png"
+    },
+    {
+        id: 9, name: "Discord Developer", cost: 75000000000, cps: 1600000, secondCost: 86000000000,
+        formula: (a: number, b: number, i: number) => b + (b - a) + 10 * (i - 1),
+        img: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Discord_Active_Developer_Badge.svg"
+    },
+    {
+        id: 10, name: "Discord Admin", cost: 1000000000000, cps: 10000000, secondCost: 1150000000000,
+        formula: (a: number, b: number, i: number) => b + (b - a) + 11 * (i - 1),
+        img: "https://cdn-icons-png.flaticon.com/512/2206/2206368.png"
+    },
+    {
+        id: 11, name: "Discord CEO", cost: 14000000000000, cps: 65000000, secondCost: 16100000000000,
+        formula: (a: number, b: number, i: number) => b + (b - a) + 12 * (i - 1),
+        img: "https://cdn-icons-png.flaticon.com/512/4961/4961733.png"
+    },
+    {
+        id: 12, name: "Discord Hacker", cost: 200000000000000, cps: 430000000, secondCost: 230000000000000,
+        formula: (a: number, b: number, i: number) => b + (b - a) + 13 * (i - 1),
+        img: "https://img.icons8.com/fluent/600/hacker.png"
+    },
 ];
 
 const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
@@ -94,8 +146,8 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
         if (!buyedElements[id]) {
             buyedElements[id] = { amount: 0 };
         }
-        if (cookies >= element.cost * Math.pow(element.costIncrease, buyedElements[id].amount)) {
-            setCookies(cookies - element.cost * Math.pow(element.costIncrease, buyedElements[id].amount));
+        if (cookies >= calculateSequence(getAmount(id), id)) {
+            setCookies(cookies - calculateSequence(getAmount(id), id));
             buyedElements[id].amount += amount;
             saveGameState();
         }
@@ -107,6 +159,19 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
 
     function calculateCps() {
         return shopElements.reduce((cps, element) => cps + element.cps * getAmount(element.id), 0);
+    }
+
+    function calculateSequence(n: number, id: number = 0): number {
+        if (n === 0) return shopElements[id].cost;
+        if (n === 1) return shopElements[id].secondCost;
+        let a = shopElements[id].cost;
+        let b = shopElements[id].secondCost;
+        for (let i = 2; i <= n; i++) {
+            const next = shopElements[id].formula(a, b, i);
+            a = b;
+            b = next;
+        }
+        return b;
     }
 
     useEffect(() => {
@@ -159,13 +224,13 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
                 </div>
                 <div className="shop">
                     <h2>Shop</h2>
-                    {shopElements.map(({ id, name, cost, cps, costIncrease }) => (
-                        <div key={id} className="shop-item" onClick={() => buyElement(id)}>
+                    {shopElements.filter(({ id }) => getAmount(id) > 0 || id === 0 || (id > 0 && getAmount(id - 1) > 0) || (id > 1 && getAmount(id - 2) > 0)).map(({ id, name, cost, cps }) => (
+                        <div key={id} className={`shop-item ${cookies >= calculateSequence(getAmount(id), id) ? "buyable" : ""} ${getAmount(id) < 1 ? "unknown" : ""}`} onClick={() => buyElement(id)}>
                             <img src={shopElements[id].img} alt={name} />
                             <div>
-                                <h3>{name}</h3>
-                                <p><img src="https://orteil.dashnet.org/cookieclicker/img/favicon.ico" alt="Cookie" /> {formatNumber(cost * Math.pow(costIncrease, getAmount(id)))}</p>
-                                <p>{formatNumber(cps)} Cookies per second</p>
+                                <h3>{getAmount(id) > 0 ? name : "???"}</h3>
+                                <p className="cost" ><img src="https://orteil.dashnet.org/cookieclicker/img/favicon.ico" alt="Cookie" /> {calculateSequence(getAmount(id), id)}</p>
+                                {getAmount(id) > 0 ? <p>{formatNumber(cps)} Cookies per second</p> : null}
                             </div>
                             <p>{getAmount(id)}</p>
                         </div>

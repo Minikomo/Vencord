@@ -2,7 +2,7 @@
 .cookie-clicker-root {
     width: 90vw;
     max-width: 1200px;
-    min-height: 300px;
+    min-height: 500px;
 }
 
 .cookie-clicker-root > div {
@@ -115,6 +115,24 @@
     display: flex;
     justify-content: flex-start;
     gap: 5px;
+}
+
+.shop-item > div > h3 {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.shop-item.unknown > img {
+    filter: brightness(0);
+}
+
+.shop-item:not(.buyable) {
+    opacity: 0.5;
+}
+
+.shop-item:not(.buyable) .cost {
+    color:  #e02525;
+    font-weight: bold;
 }
 
 /* stylelint-disable-next-line no-descending-specificity */
