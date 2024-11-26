@@ -18,6 +18,7 @@ import definePlugin, { OptionType } from "@utils/types";
 import { findByCodeLazy, findComponentByCodeLazy } from "@webpack";
 import { ApplicationAssetUtils, Button, FluxDispatcher, Forms, GuildStore, React, SelectedChannelStore, SelectedGuildStore, UserStore } from "@webpack/common";
 
+import { period } from "./api/interfaces";
 import WebUntisAPI from "./api/untisApi";
 
 const useProfileThemeStyle = findByCodeLazy("profileThemeStyle:", "--profile-gradient-primary-color");
@@ -74,6 +75,12 @@ const enum TimestampMode {
 
 
 const settings = definePluginSettings({
+    showonlyavailable: {
+        type: OptionType.BOOLEAN,
+        name: "Show only available lessons",
+        description: "Wont show lessons that wont happen",
+        defaultValue: false
+    },
     Key: {
         type: OptionType.STRING,
         name: "Key",
@@ -335,8 +342,22 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
                     startDate: getMonday(currentDate).toISOString().split("T")[0],
                     endDate: getFriday(currentDate).toISOString().split("T")[0]
                 });
+                var temp: period[] = [];
+                if (settings.store.showonlyavailable) {
+                    timetableData.periods.forEach((element: period) => {
+                        if (element.is[0] === "REGULAR" || element.is[0] === "EXAM" || element.is[0] === "IRREGULAR") {
+                            temp.push(element);
+                        }
+                    });
 
-                setTimetable(timetableData.periods);
+
+
+                }
+                else {
+                    temp = timetableData.periods;
+                }
+
+                setTimetable(temp);
             } catch (error) {
                 if (error instanceof Error) {
                     setError(error.message);
@@ -368,6 +389,7 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
 
         fetchHolidays();
     }, [currentDate]);
+
 
     const handlePreviousWeek = () => {
         setTimetable([]);
@@ -564,7 +586,6 @@ const UntisModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
 
 
 const SingleLessonModalContent = ({ rootProps, period }: { rootProps: ModalProps; period: any; }) => {
-
     return (
         <ModalRoot {...rootProps}>
             <div className="vc-untis-single-lesson">
