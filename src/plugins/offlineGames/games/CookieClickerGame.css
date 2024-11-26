@@ -1,12 +1,14 @@
+/* stylelint-disable rule-empty-line-before */
 .cookie-clicker-root {
-    width: 75vw;
-    max-width: 1000px;
-    min-height: 400px;
+    width: 90vw;
+    max-width: 1200px;
+    min-height: 300px;
 }
 
 .cookie-clicker-root > div {
     display: grid;
-    grid-template-columns: 230px 1fr 300px;
+    grid-template-columns: 250px 1fr 350px;
+    padding: 0;
 }
 
 .cookie-button {
@@ -18,7 +20,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    image-rendering: pixelated;
     background: transparent;
     filter: drop-shadow(0 0 0 #e2090918) drop-shadow(0 0 0 #09e23c28) drop-shadow(0 0 0 #09e2e21f) drop-shadow(0 0 0 #e209e227);
 }
@@ -38,32 +39,25 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    color: var(--text-normal);
-    font-size: 1em;
     border-right: 5px solid var(--background-secondary);
 }
 
-.visuals {
+.cookie-info {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 10px;
     color: var(--text-normal);
-    font-size: 1em;
-    border-left: 5px solid var(--background-secondary);
-    border-right: 5px solid var(--background-secondary);
-    overflow-y: auto;
-    /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
-    overflow-x: hidden;
-    max-height: 400px;
+    font-size: 1.5em;
+    background: var(--background-secondary);
+    padding: 10px;
+    font-weight: bold;
+    font-family: Merriweather, Georgia, serif;
+    text-shadow: 0 0 5px #0000001a;
 }
 
-.visuals::-webkit-scrollbar {
-    width: 0;
-}
-
-.visuals > div {
-    width: 100%;
+.cookie-info h3 {
+    font-size: 0.5em;
 }
 
 .shop {
@@ -73,10 +67,10 @@
     color: var(--text-normal);
     font-size: 1em;
     border-left: 5px solid var(--background-secondary);
-    overflow-y: auto;
+    overflow-y: scroll;
     /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
-    overflow-x: hidden;
-    max-height: 400px;
+    overflow-x: visible;
+    max-height: 100%;
     gap: 10px;
 }
 
@@ -92,35 +86,68 @@
     background: var(--background-secondary);
     box-shadow: 0 0 5px #0000001a;
     width: calc(100% - 10px);
+    display: grid;
+    grid-template-columns: 60px 1fr 50px;
+    gap: 10px;
 }
 
 .shop-item:hover {
-    background-color: color-mix(in srgb, var(--background-secondary) 90.9%, #ffffff80) !important;
+    transform: scale(1.025);
+    box-shadow: 0 0 10px #0000001a;
+    background: color-mix(in srgb, var(--background-secondary) 90.9%, #ffffff80);
 }
 
-.shop-item > h3 {
-    text-align: center;
+.shop-item > img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    margin: 10px;
+}
+
+.shop-item > div {
+    display: flex;
+    flex-direction: column;
     margin-top: 10px;
 }
 
+.shop-item > div > p {
+    margin: 4px 0;
+    display: flex;
+    justify-content: flex-start;
+    gap: 5px;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
 .shop-item > p {
-    text-align: center;
-    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    font-weight: bold;
 }
 
-.shop-item > button {
-    width: 90%;
-    margin: 5%;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s;
+
+.visuals {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     color: var(--text-normal);
-    background: var(--background-secondary);
-    box-shadow: 0 0 5px #0000001a;
+    font-size: 1em;
+    border-left: 5px solid var(--background-secondary);
+    border-right: 5px solid var(--background-secondary);
+    overflow-y: auto;
+    /* stylelint-disable-next-line declaration-block-no-redundant-longhand-properties */
+    overflow-x: hidden;
+    max-height: 100%;
 }
 
-.shop-item > button:hover {
-    background-color: color-mix(in srgb, var(--background-secondary) 90.9%, #ffffff80) !important;
+.visuals::-webkit-scrollbar {
+    width: 0;
+}
+
+.visuals > div {
+    width: 100%;
+    border-bottom: 5px solid var(--background-secondary);
 }
 
 .visual-item-elements {
@@ -129,7 +156,30 @@
     padding: 10px;
 }
 
+/* stylelint-disable-next-line no-descending-specificity */
 .visual-item-elements > img {
     width: 50px;
     height: 50px;
 }
+
+.floating-number {
+    position: absolute;
+    color: #ebf0f8;
+    text-shadow: 0 0 5px #000;
+    font-size: 18px;
+    font-weight: bold;
+    animation: cookie-clicker-float 1s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes cookie-clicker-float {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+}
+

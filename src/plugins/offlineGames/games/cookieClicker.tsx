@@ -25,11 +25,17 @@ const shopElements = [
     { id: 7, name: "Verified Server", cost: 100000000, cps: 1000000, costIncrease: 1.5, img: "https://cdn3.emoji.gg/emojis/3460-verified.png" },
     { id: 8, name: "Discord Employee", cost: 10000000000, cps: 100000000, costIncrease: 1.6, img: "https://img.icons8.com/fluent/600/discord-stuff-badge.png" },
     { id: 9, name: "Discord Developer", cost: 100000000000, cps: 1000000000, costIncrease: 1.7, img: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Discord_Active_Developer_Badge.svg" },
+    { id: 10, name: "Discord Admin", cost: 1000000000000, cps: 10000000000, costIncrease: 1.8, img: "https://cdn-icons-png.flaticon.com/512/2206/2206368.png" },
+    { id: 11, name: "Discord CEO", cost: 10000000000000, cps: 100000000000, costIncrease: 1.9, img: "https://cdn-icons-png.flaticon.com/512/4961/4961733.png" },
+    { id: 12, name: "Discord Hacker", cost: 100000000000000, cps: 1000000000000, costIncrease: 2, img: "https://img.icons8.com/fluent/600/hacker.png" },
 ];
 
 const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
     const [cookies, setCookies] = useState(0);
     const [buyedElements, setBuyedElements] = useState<{ amount: number; }[]>([]);
+    const [floatingNumbers, setFloatingNumbers] = useState<
+        { id: number; value: number; x: number; y: number; }[]
+    >([]);
 
     useEffect(() => {
         // Load saved game state
@@ -49,13 +55,31 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
     }, []);
 
 
-    function clickCookie() {
+    const clickCookie = (e: React.MouseEvent) => {
         setCookies(cookies + 1);
         saveGameState();
-    }
+
+        // Add a new floating number
+        const rect = e.currentTarget.getBoundingClientRect();
+        const id = Date.now(); // Unique ID for each floating number
+        setFloatingNumbers(prev => [
+            ...prev,
+            {
+                id,
+                value: 1,
+                x: e.clientX - rect.left + Math.random() * 60 - 30,
+                y: e.clientY - rect.top + Math.random() * 60 - 30,
+            },
+        ]);
+
+        // Remove the floating number after animation
+        setTimeout(() => {
+            setFloatingNumbers(prev => prev.filter(num => num.id !== id));
+        }, 1000); // Match animation duration
+    };
 
     function formatNumber(num: number) {
-        const units = ["", "K", "M", "B", "T", "Q", "S", "O"];
+        const units = ["", "K", "M", "B", "T", "Q", "S"];
         let unitIndex = 0;
         while (num >= 1000 && unitIndex < units.length - 1) {
             num /= 1000;
@@ -88,6 +112,7 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
     useEffect(() => {
         const interval = setInterval(() => {
             setCookies(cookies + calculateCps() / 10);
+            saveGameState();
         }, 100);
         return () => clearInterval(interval);
     });
@@ -100,10 +125,24 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
         <ModalRoot {...rootProps} className="cookie-clicker-root">
             <ModalContent>
                 <div className="cookie-clicker">
-                    <h2>Cookies: {formatNumber(cookies)}</h2>
-                    <h3>Cookies per second: {formatNumber(calculateCps())}</h3>
+                    <div className="cookie-info">
+                        <h2>{formatNumber(cookies)} Cookies</h2>
+                        <h3>per second: {formatNumber(calculateCps())}</h3>
+                    </div>
                     <button className="cookie-button" onClick={clickCookie} onContextMenu={clickCookie}>
-                        <img src="https://orteil.dashnet.org/cookieclicker/img/favicon.ico" alt="Cookie" />
+                        <img src="https://static.wikia.nocookie.net/cookieclicker/images/5/5a/PerfectCookie.png" alt="Cookie" />
+                        {floatingNumbers.map(number => (
+                            <div
+                                key={number.id}
+                                className="floating-number"
+                                style={{
+                                    left: number.x,
+                                    top: number.y,
+                                }}
+                            >
+                                +{number.value}
+                            </div>
+                        ))}
                     </button>
                 </div>
                 <div className="visuals">
@@ -121,19 +160,27 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
                 <div className="shop">
                     <h2>Shop</h2>
                     {shopElements.map(({ id, name, cost, cps, costIncrease }) => (
-                        <div key={id} className="shop-item">
-                            <h3>{name}</h3>
-                            <p>Amount: {getAmount(id)}</p>
-                            <p>Cookies per second: {cps}</p>
-                            <button onClick={() => buyElement(id)}>Buy 1 ({formatNumber(cost * Math.pow(costIncrease, getAmount(id)) + cps)})</button>
-                            <button onClick={() => buyElement(id, 10)}>Buy 10 ({formatNumber(cost * Math.pow(costIncrease, getAmount(id)) + cps * 10)})</button>
-                            <button onClick={() => buyElement(id, 100)}>Buy 100 ({formatNumber(cost * Math.pow(costIncrease, getAmount(id)) + cps * 100)})</button>
+                        <div key={id} className="shop-item" onClick={() => buyElement(id)}>
+                            <img src={shopElements[id].img} alt={name} />
+                            <div>
+                                <h3>{name}</h3>
+                                <p><img src="https://orteil.dashnet.org/cookieclicker/img/favicon.ico" alt="Cookie" /> {formatNumber(cost * Math.pow(costIncrease, getAmount(id)))}</p>
+                                <p>{formatNumber(cps)} Cookies per second</p>
+                            </div>
+                            <p>{getAmount(id)}</p>
                         </div>
                     ))}
                 </div>
             </ModalContent>
             <ModalFooter>
                 <h1 style={{ textAlign: "center", width: "100%", color: "white" }}>CookieClicker PRE-ALPHA</h1>
+                <button onClick={() => {
+                    setCookies(0);
+                    setBuyedElements([]);
+                    saveGameState();
+                }} style={{ backgroundColor: "red" }}>
+                    Reset?
+                </button>
             </ModalFooter>
         </ModalRoot>
     );
