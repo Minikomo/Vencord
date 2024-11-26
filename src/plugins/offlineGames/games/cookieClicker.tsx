@@ -351,7 +351,7 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
                             <div>
                                 <h3>{name}</h3>
                                 <p>{description}</p>
-                                <p className="cost"><img src="https://orteil.dashnet.org/cookieclicker/img/favicon.ico" alt="Cookie" /> {cost}</p>
+                                <p className="cost"><img src="https://orteil.dashnet.org/cookieclicker/img/favicon.ico" alt="Cookie" /> {formatNumber(cost)}</p>
                             </div>
                         </div>
                     ))}
@@ -362,7 +362,7 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
                             <img src={shopElements[id].img} alt={name} />
                             <div>
                                 <h3>{getAmount(id) > 0 ? name : "???"}</h3>
-                                <p className="cost" ><img src="https://orteil.dashnet.org/cookieclicker/img/favicon.ico" alt="Cookie" /> {calculateSequence(getAmount(id), id)}</p>
+                                <p className="cost" ><img src="https://orteil.dashnet.org/cookieclicker/img/favicon.ico" alt="Cookie" /> {formatNumber(calculateSequence(getAmount(id), id))}</p>
                                 {getAmount(id) > 0 ? <p>{formatNumber(calculateCpsForElement(id, true))} Cookies per second</p> : null}
                             </div>
                             <p>{getAmount(id)}</p>
