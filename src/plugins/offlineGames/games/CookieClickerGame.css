@@ -201,3 +201,68 @@
     }
 }
 
+.upgrade-item {
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: var(--text-normal);
+    background: var(--background-secondary);
+    box-shadow: 0 0 5px #0000001a;
+    width: calc(100% - 10px);
+    display: grid;
+    grid-template-columns: 60px 1fr 50px;
+    gap: 10px;
+}
+
+.upgrade-item:hover {
+    transform: scale(1.025);
+    box-shadow: 0 0 10px #0000001a;
+    background: color-mix(in srgb, var(--background-secondary) 90.9%, #ffffff80);
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.upgrade-item > img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    margin: 10px;
+}
+
+.upgrade-item > div {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+.upgrade-item > div > p {
+    margin: 4px 0;
+    display: flex;
+    justify-content: flex-start;
+    gap: 5px;
+}
+
+.upgrade-item > div > h3 {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.upgrade-item.unknown > img {
+    filter: brightness(0);
+}
+
+.upgrade-item.disabled {
+    display: none;
+}
+
+.upgrade-item.buyed {
+    display: none;
+}
+
+.upgrade-item:not(.buyable) {
+    opacity: 0.5;
+}
+
+.upgrade-item:not(.buyable) .cost {
+    color:  #e02525;
+    font-weight: bold;
+}

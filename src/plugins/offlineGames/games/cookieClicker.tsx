@@ -82,9 +82,55 @@ const shopElements = [
     },
 ];
 
+const upgradeElements = [
+    {
+        id: 0, name: "Server beitreten", description: "Die Maus und die " + shopElements[0].name + " sind 2x so effektiv.",
+        cost: 100,
+        img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
+        requiredElements: [{ id: 0, amount: 1 }],
+        upgrades: [{ id: 0, multiplier: 2 }, { id: -1, multiplier: 2 }]
+    },
+    {
+        id: 1, name: "Höheren Discord Server Rang", description: "Die Maus und die " + shopElements[0].name + " sind 2x so effektiv.",
+        cost: 500,
+        img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
+        requiredElements: [{ id: 0, amount: 1 }],
+        upgrades: [{ id: 0, multiplier: 2 }, { id: -1, multiplier: 2 }]
+    },
+    {
+        id: 2, name: "Server Mitglieder", description: "Die " + shopElements[1].name + " sind 2x so effektiv.",
+        cost: 1000,
+        img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
+        requiredElements: [{ id: 1, amount: 1 }],
+        upgrades: [{ id: 1, multiplier: 2 }]
+    },
+    {
+        id: 3, name: "Aktiver Server", description: "Die " + shopElements[1].name + " sind 2x so effektiv.",
+        cost: 5000,
+        img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
+        requiredElements: [{ id: 1, amount: 5 }],
+        upgrades: [{ id: 1, multiplier: 2 }]
+    },
+    {
+        id: 4, name: "Nitro Boost", description: "Die " + shopElements[2].name + " sind 2x so effektiv.",
+        cost: 11000,
+        img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
+        requiredElements: [{ id: 2, amount: 1 }],
+        upgrades: [{ id: 2, multiplier: 2 }]
+    },
+    {
+        id: 5, name: "Discord Server Mod", description: "Die Maus und die " + shopElements[0].name + " sind 2x so effektiv.",
+        cost: 10000,
+        img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
+        requiredElements: [{ id: 0, amount: 10 }],
+        upgrades: [{ id: 0, multiplier: 2 }, { id: -1, multiplier: 2 }]
+    }
+];
+
 const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
     const [cookies, setCookies] = useState(0);
     const [buyedElements, setBuyedElements] = useState<{ amount: number; }[]>([]);
+    const [buyedUpgrades, setBuyedUpgrades] = useState<{ buyed: boolean; }[]>([]);
     const [floatingNumbers, setFloatingNumbers] = useState<
         { id: number; value: number; x: number; y: number; }[]
     >([]);
@@ -94,12 +140,15 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
         const loadGameState = async () => {
             const savedState = await DataStore.get(cookieClickerStoreKey);
             if (savedState) {
-                const { cookies, buyedElements } = savedState;
+                const { cookies, buyedElements, buyedUpgrades } = savedState;
                 if (cookies) {
                     setCookies(cookies);
                 }
                 if (buyedElements) {
                     setBuyedElements(buyedElements);
+                }
+                if (buyedUpgrades) {
+                    setBuyedUpgrades(buyedUpgrades);
                 }
             }
         };
@@ -108,7 +157,18 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
 
 
     const clickCookie = (e: React.MouseEvent) => {
-        setCookies(cookies + 1);
+        let clickValue = 1;
+        upgradeElements.forEach(upgrade => {
+            if (isUpgradeBuyed(upgrade.id)) {
+                upgrade.upgrades.forEach(upgradeEffect => {
+                    if (upgradeEffect.id === -1) {
+                        clickValue *= upgradeEffect.multiplier;
+                    }
+                });
+            }
+        });
+
+        setCookies(cookies + clickValue);
         saveGameState();
 
         // Add a new floating number
@@ -118,7 +178,7 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
             ...prev,
             {
                 id,
-                value: 1,
+                value: clickValue,
                 x: e.clientX - rect.left + Math.random() * 60 - 30,
                 y: e.clientY - rect.top + Math.random() * 60 - 30,
             },
@@ -153,12 +213,44 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
         }
     }
 
+    function buyUpgrade(id: number) {
+        const upgrade = upgradeElements[id];
+        if (!buyedUpgrades[id]) {
+            buyedUpgrades[id] = { buyed: false };
+        }
+        if (cookies >= upgrade.cost) {
+            setCookies(cookies - upgrade.cost);
+            buyedUpgrades[id].buyed = true;
+            saveGameState();
+        }
+    }
+
     function getAmount(id: number) {
         return buyedElements[id] ? buyedElements[id].amount : 0;
     }
 
+    function isUpgradeBuyed(id: number) {
+        return buyedUpgrades[id] ? buyedUpgrades[id].buyed : false;
+    }
+
     function calculateCps() {
-        return shopElements.reduce((cps, element) => cps + element.cps * getAmount(element.id), 0);
+        return shopElements.reduce((cps, element) => {
+            return cps + calculateCpsForElement(element.id);
+        }, 0);
+    }
+
+    function calculateCpsForElement(id: number, single: boolean = false) {
+        let elementCps = shopElements[id].cps * (single ? 1 : getAmount(id));
+        upgradeElements.forEach(upgrade => {
+            if (isUpgradeBuyed(upgrade.id)) {
+                upgrade.upgrades.forEach(upgradeEffect => {
+                    if (upgradeEffect.id === id) {
+                        elementCps *= upgradeEffect.multiplier;
+                    }
+                });
+            }
+        });
+        return elementCps;
     }
 
     function calculateSequence(n: number, id: number = 0): number {
@@ -183,7 +275,7 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
     });
 
     function saveGameState() {
-        DataStore.set(cookieClickerStoreKey, { cookies, buyedElements });
+        DataStore.set(cookieClickerStoreKey, { cookies, buyedElements, buyedUpgrades });
     }
 
     return (
@@ -223,6 +315,19 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
                     ))}
                 </div>
                 <div className="shop">
+                    <h2>Upgrades</h2>
+                    {upgradeElements.sort((a, b) => a.cost - b.cost).map(({ id, name, description, cost, requiredElements }) => (
+                        <div key={id} className={`upgrade-item ${cookies >= cost ? "buyable" : ""} ${isUpgradeBuyed(id) ? "buyed" : ""} ${requiredElements.every(({ id, amount }) => getAmount(id) >= amount) ? "" : "disabled"}
+                        `} onClick={() => buyUpgrade(id)}>
+                            <img src={upgradeElements[id].img} alt={name} />
+                            <div>
+                                <h3>{name}</h3>
+                                <p>{description}</p>
+                                <p className="cost"><img src="https://orteil.dashnet.org/cookieclicker/img/favicon.ico" alt="Cookie" /> {cost}</p>
+                            </div>
+                        </div>
+                    ))}
+
                     <h2>Shop</h2>
                     {shopElements.filter(({ id }) => getAmount(id) > 0 || id === 0 || (id > 0 && getAmount(id - 1) > 0) || (id > 1 && getAmount(id - 2) > 0)).map(({ id, name, cost, cps }) => (
                         <div key={id} className={`shop-item ${cookies >= calculateSequence(getAmount(id), id) ? "buyable" : ""} ${getAmount(id) < 1 ? "unknown" : ""}`} onClick={() => buyElement(id)}>
@@ -230,7 +335,7 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
                             <div>
                                 <h3>{getAmount(id) > 0 ? name : "???"}</h3>
                                 <p className="cost" ><img src="https://orteil.dashnet.org/cookieclicker/img/favicon.ico" alt="Cookie" /> {calculateSequence(getAmount(id), id)}</p>
-                                {getAmount(id) > 0 ? <p>{formatNumber(cps)} Cookies per second</p> : null}
+                                {getAmount(id) > 0 ? <p>{formatNumber(calculateCpsForElement(id, true))} Cookies per second</p> : null}
                             </div>
                             <p>{getAmount(id)}</p>
                         </div>
@@ -242,6 +347,7 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
                 <button onClick={() => {
                     setCookies(0);
                     setBuyedElements([]);
+                    setBuyedUpgrades([]);
                     saveGameState();
                 }} style={{ backgroundColor: "red" }}>
                     Reset?
