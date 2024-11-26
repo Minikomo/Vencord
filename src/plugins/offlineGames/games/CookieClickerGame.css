@@ -180,6 +180,28 @@
     height: 50px;
 }
 
+.visual-item-elements > img:hover {
+    animation: visual-item-hover 1.0s infinite cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes visual-item-hover {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+    25% {
+        transform: rotate(5deg) scale(1.1);
+    }
+    50% {
+        transform: rotate(0deg) scale(1);
+    }
+    75% {
+        transform: rotate(-5deg) scale(1.1);
+    }
+    100% {
+        transform: rotate(0deg) scale(1);
+    }
+}
+
 .floating-number {
     position: absolute;
     color: #ebf0f8;

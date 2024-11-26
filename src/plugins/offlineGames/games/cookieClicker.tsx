@@ -87,72 +87,146 @@ const upgradeElements = [
         id: 0, name: "Server beitreten", description: "Die Maus und die " + shopElements[0].name + " sind 2x so effektiv.",
         cost: 100,
         img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
-        requiredElements: [{ id: 0, amount: 1 }],
-        upgrades: [{ id: 0, multiplier: 2 }, { id: -1, multiplier: 2 }]
+        unlockCondition: {
+            requiredElements: [{ id: 0, amount: 1 }],
+            requiredUpgrades: []
+        },
+        rewards: {
+            upgrades: [{ id: 0, multiplier: 2 }, { id: -1, multiplier: 2 }]
+        }
     },
     {
         id: 1, name: "Höheren Discord Server Rang", description: "Die Maus und die " + shopElements[0].name + " sind 2x so effektiv.",
         cost: 500,
         img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
-        requiredElements: [{ id: 0, amount: 1 }],
-        upgrades: [{ id: 0, multiplier: 2 }, { id: -1, multiplier: 2 }]
+        unlockCondition: {
+            requiredElements: [{ id: 0, amount: 1 }],
+            requiredUpgrades: []
+        },
+        rewards: {
+            upgrades: [{ id: 0, multiplier: 2 }, { id: -1, multiplier: 2 }]
+        }
     },
     {
         id: 2, name: "Server Mitglieder", description: "Die " + shopElements[1].name + " sind 2x so effektiv.",
         cost: 1000,
         img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
-        requiredElements: [{ id: 1, amount: 1 }],
-        upgrades: [{ id: 1, multiplier: 2 }]
+        unlockCondition: {
+            requiredElements: [{ id: 1, amount: 1 }],
+            requiredUpgrades: []
+        },
+        rewards: {
+            upgrades: [{ id: 1, multiplier: 2 }]
+        }
     },
     {
         id: 3, name: "Aktiver Server", description: "Die " + shopElements[1].name + " sind 2x so effektiv.",
         cost: 5000,
         img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
-        requiredElements: [{ id: 1, amount: 5 }],
-        upgrades: [{ id: 1, multiplier: 2 }]
+        unlockCondition: {
+            requiredElements: [{ id: 1, amount: 5 }],
+            requiredUpgrades: []
+        },
+        rewards: {
+            upgrades: [{ id: 1, multiplier: 2 }]
+        }
     },
     {
         id: 4, name: "Animated Emojis", description: "Die " + shopElements[2].name + " sind 2x so effektiv.",
         cost: 11000,
         img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
-        requiredElements: [{ id: 2, amount: 1 }],
-        upgrades: [{ id: 2, multiplier: 2 }]
+        unlockCondition: {
+            requiredElements: [{ id: 2, amount: 1 }],
+            requiredUpgrades: []
+        },
+        rewards: {
+            upgrades: [{ id: 2, multiplier: 2 }]
+        }
     },
     {
         id: 5, name: "Discord Server Mod", description: "Die Maus und die " + shopElements[0].name + " sind 2x so effektiv.",
         cost: 10000,
         img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
-        requiredElements: [{ id: 0, amount: 10 }],
-        upgrades: [{ id: 0, multiplier: 2 }, { id: -1, multiplier: 2 }]
+        unlockCondition: {
+            requiredElements: [{ id: 0, amount: 10 }],
+            requiredUpgrades: []
+        },
+        rewards: {
+            upgrades: [{ id: 0, multiplier: 2 }, { id: -1, multiplier: 2 }]
+        }
     },
     {
         id: 6, name: "Upload Limit 50mb", description: "Die " + shopElements[2].name + " sind 2x so effektiv.",
         cost: 55000,
         img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
-        requiredElements: [{ id: 2, amount: 5 }],
-        upgrades: [{ id: 2, multiplier: 2 }]
+        unlockCondition: {
+            requiredElements: [{ id: 2, amount: 5 }],
+            requiredUpgrades: []
+        },
+        rewards: {
+            upgrades: [{ id: 2, multiplier: 2 }]
+        }
     },
     {
         id: 7, name: "Animated Profile Picture", description: "Die " + shopElements[3].name + " sind 2x so effektiv.",
         cost: 120000,
         img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
-        requiredElements: [{ id: 3, amount: 1 }],
-        upgrades: [{ id: 3, multiplier: 2 }]
+        unlockCondition: {
+            requiredElements: [{ id: 3, amount: 1 }],
+            requiredUpgrades: []
+        },
+        rewards: {
+            upgrades: [{ id: 3, multiplier: 2 }]
+        }
     },
     {
         id: 8, name: "Custom Profile Banner", description: "Die " + shopElements[3].name + " sind 2x so effektiv.",
         cost: 600000,
         img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
-        requiredElements: [{ id: 3, amount: 5 }],
-        upgrades: [{ id: 3, multiplier: 2 }]
+        unlockCondition: {
+            requiredElements: [{ id: 3, amount: 5 }],
+            requiredUpgrades: []
+        },
+        rewards: {
+            upgrades: [{ id: 3, multiplier: 2 }]
+        }
     },
     {
         id: 9, name: "Server Boost", description: "Die " + shopElements[4].name + " sind 2x so effektiv.",
         cost: 1300000,
         img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
-        requiredElements: [{ id: 4, amount: 1 }],
-        upgrades: [{ id: 4, multiplier: 2 }]
-    }
+        unlockCondition: {
+            requiredElements: [{ id: 4, amount: 1 }],
+            requiredUpgrades: []
+        },
+        rewards: {
+            upgrades: [{ id: 4, multiplier: 2 }]
+        }
+    },
+    {
+        id: 10, name: "Discord Bots", description: "Die Maus und die " + shopElements[0].name + " erhalten +0.1 Cookies pro Shop Item, was kein " + shopElements[0].name + " ist.",
+        cost: 100000,
+        img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
+        unlockCondition: {
+            requiredElements: [{ id: 0, amount: 25 }],
+            requiredUpgrades: []
+        },
+        rewards: {
+            bonusesForShopItems: [{ id: 0, value: 0.1, exclude: [0] }]
+        }
+    },
+    {
+        id: 11, name: "Discord Raid", description: "Multipliziert den Gewinn von Tausend " + shopElements[0].name + " mit 5.",
+        cost: 10000000,
+        img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
+        unlockCondition: {
+            requiredElements: [{ id: 0, amount: 50 }],
+            requiredUpgrades: []
+        },
+        rewards: {
+            upgrades: [{ id: 0, multiplier: 5 }]
+        }
+    },
 ];
 
 const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) => {
@@ -160,7 +234,7 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
     const [buyedElements, setBuyedElements] = useState<{ amount: number; }[]>([]);
     const [buyedUpgrades, setBuyedUpgrades] = useState<{ buyed: boolean; }[]>([]);
     const [floatingNumbers, setFloatingNumbers] = useState<
-        { id: number; value: number; x: number; y: number; }[]
+        { id: number; value: string; x: number; y: number; }[]
     >([]);
 
     useEffect(() => {
@@ -188,10 +262,18 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
         let clickValue = 1;
         upgradeElements.forEach(upgrade => {
             if (isUpgradeBuyed(upgrade.id)) {
-                upgrade.upgrades.forEach(upgradeEffect => {
+                upgrade.rewards.upgrades?.forEach(upgradeEffect => {
                     if (upgradeEffect.id === -1) {
                         clickValue *= upgradeEffect.multiplier;
                     }
+                });
+
+                upgrade.rewards.bonusesForShopItems?.forEach(bonus => {
+                    buyedElements.forEach((element, index) => {
+                        if (element.amount > 0 && !bonus.exclude.includes(index)) {
+                            clickValue += bonus.value * element.amount;
+                        }
+                    });
                 });
             }
         });
@@ -206,7 +288,7 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
             ...prev,
             {
                 id,
-                value: clickValue,
+                value: formatNumber(clickValue),
                 x: e.clientX - rect.left + Math.random() * 60 - 30,
                 y: e.clientY - rect.top + Math.random() * 60 - 30,
             },
@@ -230,7 +312,6 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
     }
 
     function buyElement(id: number, amount: number = 1) {
-        const element = shopElements[id];
         if (!buyedElements[id]) {
             buyedElements[id] = { amount: 0 };
         }
@@ -246,7 +327,8 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
         if (!buyedUpgrades[id]) {
             buyedUpgrades[id] = { buyed: false };
         }
-        if (cookies >= upgrade.cost) {
+        const hasRequiredElements = upgrade.unlockCondition.requiredElements.every(({ id, amount }) => getAmount(id) >= amount);
+        if (cookies >= upgrade.cost && hasRequiredElements) {
             setCookies(cookies - upgrade.cost);
             buyedUpgrades[id].buyed = true;
             saveGameState();
@@ -271,9 +353,18 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
         let elementCps = shopElements[id].cps * (single ? 1 : getAmount(id));
         upgradeElements.forEach(upgrade => {
             if (isUpgradeBuyed(upgrade.id)) {
-                upgrade.upgrades.forEach(upgradeEffect => {
+                upgrade.rewards.upgrades?.forEach(upgradeEffect => {
                     if (upgradeEffect.id === id) {
                         elementCps *= upgradeEffect.multiplier;
+                    }
+                });
+                upgrade.rewards.bonusesForShopItems?.forEach(bonus => {
+                    if (bonus.id === id) {
+                        buyedElements.forEach((element, index) => {
+                            if (element.amount > 0 && !bonus.exclude.includes(index)) {
+                                elementCps += bonus.value * element.amount;
+                            }
+                        });
                     }
                 });
             }
@@ -344,7 +435,7 @@ const CookieClickerModalContent = ({ rootProps }: { rootProps: ModalProps; }) =>
                 </div>
                 <div className="shop">
                     <h2>Upgrades</h2>
-                    {upgradeElements.sort((a, b) => a.cost - b.cost).map(({ id, name, description, cost, requiredElements }) => (
+                    {upgradeElements.map(({ id, name, description, cost, unlockCondition: { requiredElements } }) => (
                         <div key={id} className={`upgrade-item ${cookies >= cost ? "buyable" : ""} ${isUpgradeBuyed(id) ? "buyed" : ""} ${requiredElements.every(({ id, amount }) => getAmount(id) >= amount) ? "" : "disabled"}
                         `} onClick={() => buyUpgrade(id)}>
                             <img src={upgradeElements[id].img} alt={name} />
