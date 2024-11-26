@@ -112,7 +112,7 @@ const upgradeElements = [
         upgrades: [{ id: 1, multiplier: 2 }]
     },
     {
-        id: 4, name: "Nitro Boost", description: "Die " + shopElements[2].name + " sind 2x so effektiv.",
+        id: 4, name: "Animated Emojis", description: "Die " + shopElements[2].name + " sind 2x so effektiv.",
         cost: 11000,
         img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
         requiredElements: [{ id: 2, amount: 1 }],
@@ -124,6 +124,34 @@ const upgradeElements = [
         img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
         requiredElements: [{ id: 0, amount: 10 }],
         upgrades: [{ id: 0, multiplier: 2 }, { id: -1, multiplier: 2 }]
+    },
+    {
+        id: 6, name: "Upload Limit 50mb", description: "Die " + shopElements[2].name + " sind 2x so effektiv.",
+        cost: 55000,
+        img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
+        requiredElements: [{ id: 2, amount: 5 }],
+        upgrades: [{ id: 2, multiplier: 2 }]
+    },
+    {
+        id: 7, name: "Animated Profile Picture", description: "Die " + shopElements[3].name + " sind 2x so effektiv.",
+        cost: 120000,
+        img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
+        requiredElements: [{ id: 3, amount: 1 }],
+        upgrades: [{ id: 3, multiplier: 2 }]
+    },
+    {
+        id: 8, name: "Custom Profile Banner", description: "Die " + shopElements[3].name + " sind 2x so effektiv.",
+        cost: 600000,
+        img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
+        requiredElements: [{ id: 3, amount: 5 }],
+        upgrades: [{ id: 3, multiplier: 2 }]
+    },
+    {
+        id: 9, name: "Server Boost", description: "Die " + shopElements[4].name + " sind 2x so effektiv.",
+        cost: 1300000,
+        img: "https://orteil.dashnet.org/cookieclicker/img/icons.png",
+        requiredElements: [{ id: 4, amount: 1 }],
+        upgrades: [{ id: 4, multiplier: 2 }]
     }
 ];
 
