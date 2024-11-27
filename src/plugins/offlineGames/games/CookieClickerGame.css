@@ -25,8 +25,22 @@
 }
 
 .cookie-button:active {
-    transform: scale(0.9);
-    filter: drop-shadow(-10px 0 10px #e2090968) drop-shadow(0 10px 10px #09e23c57) drop-shadow(10px 0 10px #09e2e24d) drop-shadow(0 -10px 10px #e209e238);
+    animation: cookie-clicker-rotate 0.1s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes cookie-clicker-rotate {
+    0% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 0 #e2090918) drop-shadow(0 0 0 #09e23c28) drop-shadow(0 0 0 #09e2e21f) drop-shadow(0 0 0 #e209e227);
+    }
+    50% {
+        transform: scale(0.9);
+        filter: drop-shadow(-15px 0 15px #e2090968) drop-shadow(0 15px 15px #09e23c57) drop-shadow(15px 0 15px #09e2e24d) drop-shadow(0 -15px 15px #e209e238);
+    }
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 0 #e2090918) drop-shadow(0 0 0 #09e23c28) drop-shadow(0 0 0 #09e2e21f) drop-shadow(0 0 0 #e209e227);
+    }
 }
 
 .cookie-button img {
