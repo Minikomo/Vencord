@@ -37,29 +37,42 @@ class WebUntisAPI {
     }
     public async getCurrentLesson() {
         const timetable = await this.getTimetable({});
+        const { periods } = timetable;
 
-        // Merge lessons together if end time is equal to start time of next lesson and they have the same subjects, teachers, classes and rooms
-        const mergedPeriods = timetable.periods.reduce((acc, period, index) => {
-            const nextPeriod = timetable.periods[index + 1];
-            if (
-                nextPeriod &&
-                period.endDateTimeUnix === nextPeriod.startDateTimeUnix &&
-                period.subjects?.every((subject, index) => subject.id === nextPeriod.subjects?.[index].id) &&
-                period.teachers?.every((teacher, index) => teacher.id === nextPeriod.teachers?.[index].id) &&
-                period.classes?.every((class_, index) => class_.id === nextPeriod.classes?.[index].id) &&
-                period.rooms?.every((room, index) => room.id === nextPeriod.rooms?.[index].id)
-            ) {
-                return [
-                    ...acc,
-                    {
-                        ...period,
-                        endDateTimeUnix: nextPeriod.endDateTimeUnix,
-                    },
-                ];
+        let filtered = periods.sort((a, b) => {
+            const startDateA = new Date(a.startDateTime);
+            const startDateB = new Date(b.startDateTime);
+
+            if (startDateA < startDateB) return -1;
+            if (startDateA > startDateB) return 1;
+            return 0;
+        });
+
+        filtered = filtered.filter(element => !element.is.includes("CANCELLED"));
+
+        // Merge lessons together if end time is equal to start time of next lesson and they have the same elements
+        for (let i = 0; i < filtered.length - 1; i++) {
+            const current = filtered[i];
+            const next = filtered[i + 1];
+
+            if (current.endDateTime === next.startDateTime && current.elements.length === next.elements.length) {
+                let equal = true;
+                for (let j = 0; j < current.elements.length; j++) {
+                    if (current.elements[j].id !== next.elements[j].id) {
+                        equal = false;
+                        break;
+                    }
+                }
+
+                if (equal) {
+                    current.endDateTime = next.endDateTime;
+                    filtered.splice(i + 1, 1);
+                    i--;
+                }
             }
+        }
 
-            return [...acc, period];
-        }, [] as periodArray["periods"]);
+        const mergedPeriods = filtered;
 
         const now = Date.now() + 3600000; // Add 1 hour (3600000 milliseconds)
 
