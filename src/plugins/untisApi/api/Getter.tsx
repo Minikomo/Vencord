@@ -5,7 +5,7 @@
  */
 
 import { userApiData } from "./interfaces";
-
+// had to change smth
 class Getter {
     private arraythingy: userApiData;
 
