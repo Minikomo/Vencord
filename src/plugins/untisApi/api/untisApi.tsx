@@ -61,7 +61,7 @@ class WebUntisAPI {
             return [...acc, period];
         }, [] as periodArray["periods"]);
 
-        const now = Date.now();
+        const now = Date.now() + 3600000; // Add 1 hour (3600000 milliseconds)
 
         const currentIndex = mergedPeriods.findIndex(
             period => period.startDateTimeUnix! <= now && period.endDateTimeUnix! >= now
