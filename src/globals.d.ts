@@ -23,7 +23,7 @@ declare global {
      * This exists only at build time, so references to it in patches should insert it
      * via String interpolation OR use different replacement code based on this
      * but NEVER reference it inside the patched code
-     *
+     * test
      * @example
      * // BAD
      * replace: "IS_WEB?foo:bar"
