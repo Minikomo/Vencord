@@ -240,8 +240,8 @@ async function createActivity(): Promise<Activity | undefined> {
             || "Unknown Activity",
         type: settings.store.type,
         timestamps: {
-            start: new Date(currentLesson.startDateTime).getTime(),
-            end: new Date(currentLesson.endDateTime).getTime()
+            start: new Date(currentLesson.startDateTime).getTime() - 3600000,
+            end: new Date(currentLesson.endDateTime).getTime() - 3600000
         },
         assets: {
             large_image: await getApplicationAsset("https://play-lh.googleusercontent.com/6lUhld8gFhB0_b-lpce_crw-gdH70lDnXot5ckVmOFMh91jag56whanU-Q30nLt68sr5=w240-h480-rw"),
